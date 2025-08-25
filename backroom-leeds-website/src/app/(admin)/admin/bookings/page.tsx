@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { Heading, Text, Button, LoadingSpinner } from '@/components/atoms';
-import { Card } from '@/components/molecules';
+import { Card, BulkBookingActions, AdvancedBookingFilters, BookingTableRow } from '@/components/molecules';
 import { createClient } from '@/lib/supabase/client';
 
 interface Booking {
@@ -23,13 +23,27 @@ interface Booking {
   remaining_balance: number;
   checked_in_at?: string;
   created_at: string;
+  payment_status?: 'paid' | 'partial' | 'pending' | 'refunded';
+  notes?: string;
 }
 
 interface BookingFilters {
-  date: string;
-  status: string;
-  table: string;
+  dateRange: {
+    from: string;
+    to: string;
+  };
+  status: string[];
+  paymentStatus: string[];
+  tables: number[];
+  eventType: string;
+  arrivalTime: string;
+  partySize: {
+    min: number;
+    max: number;
+  };
   searchTerm: string;
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
 }
 
 export default function AdminBookingsPage() {
@@ -39,26 +53,57 @@ export default function AdminBookingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<BookingFilters>({
-    date: new Date().toISOString().split('T')[0],
-    status: 'all',
-    table: '',
+    dateRange: {
+      from: new Date().toISOString().split('T')[0],
+      to: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    },
+    status: [],
+    paymentStatus: [],
+    tables: [],
+    eventType: '',
+    arrivalTime: '',
+    partySize: { min: 1, max: 12 },
     searchTerm: '',
+    sortBy: 'booking_date',
+    sortOrder: 'asc',
   });
   const [processingCheckIn, setProcessingCheckIn] = useState<string | null>(null);
   const [manualCheckInRef, setManualCheckInRef] = useState('');
+  const [selectedBookings, setSelectedBookings] = useState<string[]>([]);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
+  const [processingAction, setProcessingAction] = useState<string | null>(null);
 
   const supabase = createClient();
+
+  // User permissions
+  const userPermissions = {
+    canModifyBookings: session?.user?.permissions?.canModifyBookings || false,
+    canCheckInCustomers: session?.user?.permissions?.canCheckInCustomers || false,
+    canViewPayments: session?.user?.role === 'super_admin' || session?.user?.role === 'manager',
+    canProcessPayments: session?.user?.role === 'super_admin' || session?.user?.role === 'manager',
+  };
 
   const fetchBookings = useCallback(async () => {
     try {
       setError(null);
+      setLoading(true);
       
-      const { data, error: fetchError } = await supabase
+      let query = supabase
         .from('bookings')
-        .select('*')
-        .gte('booking_date', filters.date)
-        .lte('booking_date', filters.date)
-        .order('arrival_time', { ascending: true });
+        .select('*');
+
+      // Apply date range filter
+      if (filters.dateRange.from) {
+        query = query.gte('booking_date', filters.dateRange.from);
+      }
+      if (filters.dateRange.to) {
+        query = query.lte('booking_date', filters.dateRange.to);
+      }
+
+      // Apply sorting
+      query = query.order(filters.sortBy, { ascending: filters.sortOrder === 'asc' });
+
+      const { data, error: fetchError } = await query;
 
       if (fetchError) {
         throw new Error(`Failed to fetch bookings: ${fetchError.message}`);
@@ -70,22 +115,39 @@ export default function AdminBookingsPage() {
     } finally {
       setLoading(false);
     }
-  }, [supabase, filters.date]);
+  }, [supabase, filters.dateRange, filters.sortBy, filters.sortOrder]);
 
   const applyFilters = useCallback(() => {
     let filtered = [...bookings];
 
     // Status filter
-    if (filters.status !== 'all') {
-      filtered = filtered.filter(booking => booking.status === filters.status);
+    if (filters.status.length > 0) {
+      filtered = filtered.filter(booking => filters.status.includes(booking.status));
+    }
+
+    // Payment status filter
+    if (filters.paymentStatus.length > 0) {
+      filtered = filtered.filter(booking => 
+        booking.payment_status && filters.paymentStatus.includes(booking.payment_status)
+      );
     }
 
     // Table filter
-    if (filters.table) {
-      const tableNumber = parseInt(filters.table);
+    if (filters.tables.length > 0) {
       filtered = filtered.filter(booking => 
-        booking.table_ids.includes(tableNumber)
+        booking.table_ids.some(tableId => filters.tables.includes(tableId))
       );
+    }
+
+    // Party size filter
+    filtered = filtered.filter(booking => 
+      booking.party_size >= filters.partySize.min && 
+      booking.party_size <= filters.partySize.max
+    );
+
+    // Arrival time filter
+    if (filters.arrivalTime) {
+      filtered = filtered.filter(booking => booking.arrival_time === filters.arrivalTime);
     }
 
     // Search term filter
@@ -102,35 +164,119 @@ export default function AdminBookingsPage() {
     setFilteredBookings(filtered);
   }, [bookings, filters]);
 
-  const handleCheckIn = async (bookingId: string, bookingRef: string) => {
-    if (!session?.user?.permissions?.canCheckInCustomers) {
-      alert('You do not have permission to check in customers');
-      return;
-    }
-
-    setProcessingCheckIn(bookingId);
+  const handleBulkAction = async (action: string, bookingIds: string[]) => {
+    setProcessingAction(action);
     
     try {
-      const response = await fetch(`/api/admin/bookings/${bookingId}/check-in`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const promises = bookingIds.map(async (id) => {
+        const response = await fetch(`/api/admin/bookings/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            action: action,
+            status: action === 'confirm' ? 'confirmed' : 
+                   action === 'cancel' ? 'cancelled' : 
+                   action === 'no_show' ? 'no_show' : 
+                   action === 'check_in' ? 'arrived' : undefined
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `Failed to ${action} booking ${id}`);
+        }
+
+        return response.json();
+      });
+
+      await Promise.all(promises);
+      
+      // Clear selections and refresh
+      setSelectedBookings([]);
+      await fetchBookings();
+      
+      alert(`Successfully ${action}ed ${bookingIds.length} booking${bookingIds.length !== 1 ? 's' : ''}`);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : `Failed to ${action} bookings`);
+    } finally {
+      setProcessingAction(null);
+    }
+  };
+
+  const handleBookingAction = async (action: string, bookingId: string) => {
+    setProcessingAction(action);
+    
+    try {
+      let endpoint = `/api/admin/bookings/${bookingId}`;
+      let method = 'PATCH';
+      let body: any = { action };
+
+      // Special handling for different actions
+      if (action === 'check_in') {
+        endpoint = `/api/admin/bookings/${bookingId}/check-in`;
+        method = 'POST';
+        body = {};
+      } else if (action === 'confirm') {
+        body.status = 'confirmed';
+      } else if (action === 'cancel') {
+        body.status = 'cancelled';
+      } else if (action === 'no_show') {
+        body.status = 'no_show';
+      }
+
+      const response = await fetch(endpoint, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to check in customer');
+        throw new Error(errorData.error || `Failed to ${action} booking`);
       }
 
       // Refresh bookings
       await fetchBookings();
-      alert(`Successfully checked in ${bookingRef}`);
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to check in customer');
+      alert(err instanceof Error ? err.message : `Failed to ${action} booking`);
     } finally {
-      setProcessingCheckIn(null);
+      setProcessingAction(null);
     }
+  };
+
+  const handleBookingSelection = (bookingId: string, selected: boolean) => {
+    setSelectedBookings(prev => 
+      selected 
+        ? [...prev, bookingId]
+        : prev.filter(id => id !== bookingId)
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedBookings.length === filteredBookings.length) {
+      setSelectedBookings([]);
+    } else {
+      setSelectedBookings(filteredBookings.map(b => b.id));
+    }
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      dateRange: {
+        from: new Date().toISOString().split('T')[0],
+        to: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      },
+      status: [],
+      paymentStatus: [],
+      tables: [],
+      eventType: '',
+      arrivalTime: '',
+      partySize: { min: 1, max: 12 },
+      searchTerm: '',
+      sortBy: 'booking_date',
+      sortOrder: 'asc',
+    });
+    setSelectedBookings([]);
   };
 
   const handleManualCheckIn = async () => {
@@ -150,35 +296,8 @@ export default function AdminBookingsPage() {
       return;
     }
 
-    await handleCheckIn(booking.id, booking.booking_ref);
+    await handleBookingAction('check_in', booking.id);
     setManualCheckInRef('');
-  };
-
-  const updateBookingStatus = async (bookingId: string, newStatus: string) => {
-    if (!session?.user?.permissions?.canModifyBookings) {
-      alert('You do not have permission to modify bookings');
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/admin/bookings/${bookingId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update booking');
-      }
-
-      // Refresh bookings
-      await fetchBookings();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to update booking');
-    }
   };
 
   useEffect(() => {
@@ -203,71 +322,11 @@ export default function AdminBookingsPage() {
     return () => {
       bookingsSubscription.unsubscribe();
     };
-  }, [filters.date, fetchBookings, supabase]);
+  }, [fetchBookings, supabase]);
 
   useEffect(() => {
     applyFilters();
   }, [applyFilters]);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'confirmed': return 'bg-blue-500/20 text-blue-400';
-      case 'pending': return 'bg-yellow-500/20 text-yellow-400';
-      case 'arrived': return 'bg-green-500/20 text-green-400';
-      case 'no_show': return 'bg-red-500/20 text-red-400';
-      case 'cancelled': return 'bg-gray-500/20 text-gray-400';
-      default: return 'bg-speakeasy-gold/20 text-speakeasy-gold';
-    }
-  };
-
-  const getActionButtons = (booking: Booking) => {
-    const buttons = [];
-
-    if (booking.status === 'confirmed' && session?.user?.permissions?.canCheckInCustomers) {
-      buttons.push(
-        <Button
-          key="checkin"
-          size="sm"
-          variant="outline"
-          onClick={() => handleCheckIn(booking.id, booking.booking_ref)}
-          disabled={processingCheckIn === booking.id}
-          className="text-green-400 border-green-400/20 hover:bg-green-400/10"
-        >
-          {processingCheckIn === booking.id ? 'Checking In...' : 'Check In'}
-        </Button>
-      );
-    }
-
-    if (booking.status === 'pending' && session?.user?.permissions?.canModifyBookings) {
-      buttons.push(
-        <Button
-          key="confirm"
-          size="sm"
-          variant="outline"
-          onClick={() => updateBookingStatus(booking.id, 'confirmed')}
-          className="text-blue-400 border-blue-400/20 hover:bg-blue-400/10"
-        >
-          Confirm
-        </Button>
-      );
-    }
-
-    if (booking.status === 'confirmed' && session?.user?.permissions?.canModifyBookings) {
-      buttons.push(
-        <Button
-          key="noshow"
-          size="sm"
-          variant="outline"
-          onClick={() => updateBookingStatus(booking.id, 'no_show')}
-          className="text-red-400 border-red-400/20 hover:bg-red-400/10"
-        >
-          No Show
-        </Button>
-      );
-    }
-
-    return buttons;
-  };
 
   if (loading) {
     return (
@@ -278,7 +337,7 @@ export default function AdminBookingsPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -290,14 +349,15 @@ export default function AdminBookingsPage() {
           </Text>
         </div>
         <div className="flex gap-3">
-          <Button 
-            variant="primary" 
-            size="sm"
-            href="/admin/bookings/new"
-            disabled={!session?.user?.permissions?.canModifyBookings}
-          >
-            New Booking
-          </Button>
+          {userPermissions.canModifyBookings && (
+            <Button 
+              variant="primary" 
+              size="sm"
+              href="/admin/bookings/new"
+            >
+              New Booking
+            </Button>
+          )}
           <Button 
             variant="outline" 
             size="sm"
@@ -315,81 +375,48 @@ export default function AdminBookingsPage() {
         </Card>
       )}
 
-      {/* Filters */}
-      <Card className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-speakeasy-champagne mb-2">
-              Date
-            </label>
-            <input
-              type="date"
-              value={filters.date}
-              onChange={(e) => setFilters(prev => ({ ...prev, date: e.target.value }))}
-              className="w-full px-3 py-2 bg-speakeasy-noir/50 border border-speakeasy-gold/20 rounded text-speakeasy-champagne focus:outline-none focus:border-speakeasy-gold"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-speakeasy-champagne mb-2">
-              Status
-            </label>
-            <select
-              value={filters.status}
-              onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-              className="w-full px-3 py-2 bg-speakeasy-noir/50 border border-speakeasy-gold/20 rounded text-speakeasy-champagne focus:outline-none focus:border-speakeasy-gold"
-            >
-              <option value="all">All Statuses</option>
-              <option value="pending">Pending</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="arrived">Arrived</option>
-              <option value="no_show">No Show</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-speakeasy-champagne mb-2">
-              Table
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="16"
-              placeholder="1-16"
-              value={filters.table}
-              onChange={(e) => setFilters(prev => ({ ...prev, table: e.target.value }))}
-              className="w-full px-3 py-2 bg-speakeasy-noir/50 border border-speakeasy-gold/20 rounded text-speakeasy-champagne focus:outline-none focus:border-speakeasy-gold"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-speakeasy-champagne mb-2">
-              Search
-            </label>
-            <input
-              type="text"
-              placeholder="Name, email, or reference"
-              value={filters.searchTerm}
-              onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
-              className="w-full px-3 py-2 bg-speakeasy-noir/50 border border-speakeasy-gold/20 rounded text-speakeasy-champagne focus:outline-none focus:border-speakeasy-gold"
-            />
-          </div>
-          <div className="flex items-end">
-            <Text className="text-sm text-speakeasy-champagne/60">
-              {filteredBookings.length} of {bookings.length} bookings
-            </Text>
-          </div>
-        </div>
-      </Card>
+      {/* Advanced Filters */}
+      <AdvancedBookingFilters
+        filters={filters}
+        onFiltersChange={setFilters}
+        onReset={resetFilters}
+        isExpanded={filtersExpanded}
+        onToggleExpanded={() => setFiltersExpanded(!filtersExpanded)}
+        totalBookings={bookings.length}
+        filteredBookings={filteredBookings.length}
+      />
+
+      {/* Bulk Actions */}
+      {selectedBookings.length > 0 && (
+        <BulkBookingActions
+          selectedBookings={selectedBookings}
+          onBulkAction={handleBulkAction}
+          userPermissions={userPermissions}
+        />
+      )}
 
       {/* Bookings Table */}
       <Card className="overflow-hidden">
         <div className="p-6 border-b border-speakeasy-gold/20">
           <div className="flex items-center justify-between">
             <Heading level={2} className="text-xl font-bebas text-speakeasy-gold">
-              Bookings for {new Date(filters.date).toLocaleDateString()}
+              Bookings List
             </Heading>
-            <Text className="text-sm text-speakeasy-champagne/60">
-              {filteredBookings.length} bookings
-            </Text>
+            <div className="flex items-center gap-4">
+              <Text className="text-sm text-speakeasy-champagne/60">
+                {filteredBookings.length} of {bookings.length} bookings
+              </Text>
+              {filteredBookings.length > 0 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleSelectAll}
+                  className="text-speakeasy-gold border-speakeasy-gold/20"
+                >
+                  {selectedBookings.length === filteredBookings.length ? 'Deselect All' : 'Select All'}
+                </Button>
+              )}
+            </div>
           </div>
         </div>
         
@@ -397,77 +424,38 @@ export default function AdminBookingsPage() {
           <table className="w-full">
             <thead className="bg-speakeasy-noir/30">
               <tr>
+                <th className="text-left p-4 text-speakeasy-gold font-bebas">
+                  <input
+                    type="checkbox"
+                    checked={selectedBookings.length === filteredBookings.length && filteredBookings.length > 0}
+                    onChange={handleSelectAll}
+                    className="w-4 h-4 rounded border-speakeasy-gold/20 bg-speakeasy-noir/50 text-speakeasy-gold"
+                  />
+                </th>
                 <th className="text-left p-4 text-speakeasy-gold font-bebas">Reference</th>
                 <th className="text-left p-4 text-speakeasy-gold font-bebas">Customer</th>
                 <th className="text-left p-4 text-speakeasy-gold font-bebas">Tables</th>
-                <th className="text-left p-4 text-speakeasy-gold font-bebas">Time</th>
+                <th className="text-left p-4 text-speakeasy-gold font-bebas">Date/Time</th>
                 <th className="text-left p-4 text-speakeasy-gold font-bebas">Party</th>
                 <th className="text-left p-4 text-speakeasy-gold font-bebas">Status</th>
-                <th className="text-left p-4 text-speakeasy-gold font-bebas">Amount</th>
+                <th className="text-left p-4 text-speakeasy-gold font-bebas">Payment</th>
                 <th className="text-left p-4 text-speakeasy-gold font-bebas">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredBookings.length > 0 ? filteredBookings.map(booking => (
-                <tr key={booking.id} className="border-b border-speakeasy-gold/10 hover:bg-speakeasy-noir/20">
-                  <td className="p-4">
-                    <Text className="text-speakeasy-champagne font-mono text-sm">
-                      {booking.booking_ref}
-                    </Text>
-                    {booking.checked_in_at && (
-                      <Text className="text-green-400 text-xs">
-                        Checked in at {new Date(booking.checked_in_at).toLocaleTimeString()}
-                      </Text>
-                    )}
-                  </td>
-                  <td className="p-4">
-                    <div>
-                      <Text className="text-speakeasy-champagne font-medium">{booking.customer_name}</Text>
-                      <Text className="text-speakeasy-champagne/60 text-xs">{booking.customer_email}</Text>
-                      <Text className="text-speakeasy-champagne/60 text-xs">{booking.customer_phone}</Text>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex flex-wrap gap-1">
-                      {booking.table_ids.map(tableId => (
-                        <span key={tableId} className="inline-block px-2 py-1 bg-speakeasy-gold/20 text-speakeasy-gold rounded text-xs">
-                          {tableId}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <Text className="text-speakeasy-champagne">{booking.arrival_time}</Text>
-                  </td>
-                  <td className="p-4">
-                    <Text className="text-speakeasy-champagne">{booking.party_size}</Text>
-                  </td>
-                  <td className="p-4">
-                    <span className={`inline-block px-2 py-1 rounded text-xs capitalize ${getStatusColor(booking.status)}`}>
-                      {booking.status.replace('_', ' ')}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    <div className="text-sm">
-                      <Text className="text-speakeasy-champagne">
-                        £{booking.deposit_amount}
-                      </Text>
-                      {booking.package_amount && (
-                        <Text className="text-speakeasy-champagne/60 text-xs">
-                          +£{booking.package_amount} pkg
-                        </Text>
-                      )}
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex flex-wrap gap-1">
-                      {getActionButtons(booking)}
-                    </div>
-                  </td>
-                </tr>
+                <BookingTableRow
+                  key={booking.id}
+                  booking={booking}
+                  isSelected={selectedBookings.includes(booking.id)}
+                  onSelect={handleBookingSelection}
+                  onAction={handleBookingAction}
+                  userPermissions={userPermissions}
+                  processingAction={processingAction}
+                />
               )) : (
                 <tr>
-                  <td colSpan={8} className="p-8 text-center text-speakeasy-champagne/60">
+                  <td colSpan={9} className="p-8 text-center text-speakeasy-champagne/60">
                     No bookings found for the selected filters
                   </td>
                 </tr>
@@ -477,8 +465,8 @@ export default function AdminBookingsPage() {
         </div>
       </Card>
 
-      {/* Quick Check-in Section */}
-      {session?.user?.permissions?.canCheckInCustomers && (
+      {/* Quick Check-in Section - Mobile Optimized for Door Staff */}
+      {userPermissions.canCheckInCustomers && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="p-6">
             <Heading level={2} className="text-xl font-bebas text-speakeasy-gold mb-4">
@@ -514,42 +502,54 @@ export default function AdminBookingsPage() {
                   placeholder="BRL-2025-XXXXX"
                   value={manualCheckInRef}
                   onChange={(e) => setManualCheckInRef(e.target.value.toUpperCase())}
-                  className="w-full px-3 py-2 bg-speakeasy-noir/50 border border-speakeasy-gold/20 rounded text-speakeasy-champagne focus:outline-none focus:border-speakeasy-gold font-mono"
+                  className="w-full px-4 py-3 bg-speakeasy-noir/50 border border-speakeasy-gold/20 rounded text-speakeasy-champagne focus:outline-none focus:border-speakeasy-gold font-mono text-lg"
                   onKeyPress={(e) => e.key === 'Enter' && handleManualCheckIn()}
                 />
               </div>
               <Button 
                 variant="primary" 
-                size="sm" 
+                size="lg" 
                 className="w-full" 
                 onClick={handleManualCheckIn}
-                disabled={!manualCheckInRef.trim() || processingCheckIn !== null}
+                disabled={!manualCheckInRef.trim() || processingAction !== null}
               >
-                Check In by Reference
+                {processingAction ? (
+                  <>
+                    <LoadingSpinner size="sm" color="white" />
+                    Processing...
+                  </>
+                ) : (
+                  'Check In by Reference'
+                )}
               </Button>
             </div>
 
             <div className="mt-6 pt-6 border-t border-speakeasy-gold/20">
               <Text className="text-speakeasy-champagne/80 text-sm font-medium mb-3">
-                Recent Check-ins
+                Recent Check-ins Today
               </Text>
-              <div className="space-y-2 max-h-32 overflow-y-auto">
+              <div className="space-y-2 max-h-40 overflow-y-auto">
                 {filteredBookings
                   .filter(b => b.status === 'arrived' && b.checked_in_at)
                   .sort((a, b) => new Date(b.checked_in_at!).getTime() - new Date(a.checked_in_at!).getTime())
-                  .slice(0, 5)
+                  .slice(0, 8)
                   .map(booking => (
-                    <div key={booking.id} className="text-sm text-speakeasy-champagne/60 flex justify-between">
-                      <span>
-                        Tables {booking.table_ids.join(', ')} - {booking.customer_name}
-                      </span>
-                      <span>
+                    <div key={booking.id} className="flex justify-between items-center p-2 bg-speakeasy-noir/30 rounded text-sm">
+                      <div>
+                        <Text className="text-speakeasy-champagne font-medium">
+                          {booking.customer_name}
+                        </Text>
+                        <Text className="text-speakeasy-champagne/60 text-xs">
+                          Tables {booking.table_ids.join(', ')} • {booking.party_size} guests
+                        </Text>
+                      </div>
+                      <Text className="text-green-400 text-xs">
                         {booking.checked_in_at && new Date(booking.checked_in_at).toLocaleTimeString()}
-                      </span>
+                      </Text>
                     </div>
                   ))}
                 {filteredBookings.filter(b => b.status === 'arrived').length === 0 && (
-                  <Text className="text-speakeasy-champagne/50 text-sm">No recent check-ins today</Text>
+                  <Text className="text-speakeasy-champagne/50 text-sm">No check-ins yet today</Text>
                 )}
               </div>
             </div>
@@ -557,39 +557,64 @@ export default function AdminBookingsPage() {
         </div>
       )}
 
-      {/* Stats Summary */}
+      {/* Enhanced Stats Summary */}
       <Card className="p-6">
-        <Heading level={2} className="text-xl font-bebas text-speakeasy-gold mb-4">
+        <Heading level={2} className="text-xl font-bebas text-speakeasy-gold mb-6">
           Today&apos;s Summary
         </Heading>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
           {[
-            { label: 'Total', value: filteredBookings.length, color: 'text-speakeasy-champagne' },
-            { label: 'Confirmed', value: filteredBookings.filter(b => b.status === 'confirmed').length, color: 'text-blue-400' },
-            { label: 'Arrived', value: filteredBookings.filter(b => b.status === 'arrived').length, color: 'text-green-400' },
-            { label: 'No Shows', value: filteredBookings.filter(b => b.status === 'no_show').length, color: 'text-red-400' },
-            { label: 'Cancelled', value: filteredBookings.filter(b => b.status === 'cancelled').length, color: 'text-gray-400' },
+            { label: 'Total', value: filteredBookings.length, color: 'text-speakeasy-champagne', icon: '📊' },
+            { label: 'Confirmed', value: filteredBookings.filter(b => b.status === 'confirmed').length, color: 'text-blue-400', icon: '✅' },
+            { label: 'Arrived', value: filteredBookings.filter(b => b.status === 'arrived').length, color: 'text-green-400', icon: '🎫' },
+            { label: 'No Shows', value: filteredBookings.filter(b => b.status === 'no_show').length, color: 'text-red-400', icon: '🚫' },
+            { label: 'Cancelled', value: filteredBookings.filter(b => b.status === 'cancelled').length, color: 'text-gray-400', icon: '❌' },
+            { label: 'Pending', value: filteredBookings.filter(b => b.status === 'pending').length, color: 'text-yellow-400', icon: '⏳' },
           ].map(stat => (
-            <div key={stat.label} className="text-center">
-              <Text className={`text-2xl font-bebas ${stat.color}`}>{stat.value}</Text>
+            <div key={stat.label} className="text-center p-4 bg-speakeasy-noir/20 rounded-lg">
+              <div className="text-2xl mb-2">{stat.icon}</div>
+              <Text className={`text-3xl font-bebas ${stat.color} mb-1`}>{stat.value}</Text>
               <Text className="text-speakeasy-champagne/60 text-sm">{stat.label}</Text>
             </div>
           ))}
         </div>
-        <div className="mt-4 pt-4 border-t border-speakeasy-gold/20">
-          <div className="flex justify-between items-center">
-            <Text className="text-speakeasy-champagne/80 text-sm">
-              Total Revenue (Deposits + Packages):
-            </Text>
-            <Text className="text-speakeasy-gold font-bebas text-lg">
-              £{filteredBookings
-                .filter(b => b.status !== 'cancelled')
-                .reduce((sum, b) => sum + b.deposit_amount + (b.package_amount || 0), 0)
-                .toFixed(2)
-              }
-            </Text>
+        
+        {userPermissions.canViewPayments && (
+          <div className="mt-6 pt-6 border-t border-speakeasy-gold/20">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center">
+                <Text className="text-speakeasy-gold font-bebas text-2xl">
+                  £{filteredBookings
+                    .filter(b => b.status !== 'cancelled')
+                    .reduce((sum, b) => sum + b.deposit_amount, 0)
+                    .toFixed(2)
+                  }
+                </Text>
+                <Text className="text-speakeasy-champagne/60 text-sm">Deposits Collected</Text>
+              </div>
+              <div className="text-center">
+                <Text className="text-speakeasy-copper font-bebas text-2xl">
+                  £{filteredBookings
+                    .filter(b => b.status !== 'cancelled')
+                    .reduce((sum, b) => sum + (b.package_amount || 0), 0)
+                    .toFixed(2)
+                  }
+                </Text>
+                <Text className="text-speakeasy-champagne/60 text-sm">Package Revenue</Text>
+              </div>
+              <div className="text-center">
+                <Text className="text-green-400 font-bebas text-2xl">
+                  £{filteredBookings
+                    .filter(b => b.status !== 'cancelled')
+                    .reduce((sum, b) => sum + b.deposit_amount + (b.package_amount || 0), 0)
+                    .toFixed(2)
+                  }
+                </Text>
+                <Text className="text-speakeasy-champagne/60 text-sm">Total Revenue</Text>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </Card>
     </div>
   );

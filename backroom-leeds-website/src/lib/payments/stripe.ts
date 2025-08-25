@@ -125,25 +125,38 @@ function getAlternativePaymentMethods(declineCode?: string): string[] {
   return alternatives;
 }
 
-// Create payment intent with UK-specific settings
-export async function createPaymentIntent(options: CreatePaymentIntentOptions): Promise<PaymentResult> {
+// Enhanced payment intent creation with multiple payment methods
+export async function createEnhancedPaymentIntent(options: CreatePaymentIntentOptions & {
+  paymentMethod?: string;
+  enabledMethods?: string[];
+}): Promise<PaymentResult> {
   try {
+    // Determine payment method types based on request
+    const paymentMethodTypes = getPaymentMethodTypes(options.paymentMethod, options.enabledMethods);
+    
+    // Configure payment method options
+    const paymentMethodOptions = getPaymentMethodOptions(paymentMethodTypes);
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount: options.amount,
       currency: options.currency || 'gbp',
-      confirmation_method: 'manual',
-      payment_method_types: ['card', 'bacs_debit'],
-      payment_method_options: {
-        card: {
-          request_three_d_secure: 'automatic', // Required for SCA compliance
-        },
-        bacs_debit: {
-          setup_future_usage: 'off_session'
-        }
+      confirmation_method: 'automatic',
+      payment_method_types: paymentMethodTypes,
+      payment_method_options: paymentMethodOptions,
+      metadata: {
+        ...options.metadata,
+        payment_methods_enabled: paymentMethodTypes.join(','),
+        customer_region: 'GB'
       },
-      metadata: options.metadata,
       receipt_email: options.customerEmail,
-      description: options.description || `Table booking deposit - The Backroom Leeds`
+      description: options.description || `Table booking - The Backroom Leeds`,
+      
+      // Enhanced configuration for UK payments
+      statement_descriptor: 'BACKROOM LEEDS',
+      statement_descriptor_suffix: 'BOOKING',
+      
+      // Configure for mobile payments
+      setup_future_usage: options.paymentMethod === 'card' ? 'off_session' : undefined
     });
 
     return {
@@ -155,6 +168,93 @@ export async function createPaymentIntent(options: CreatePaymentIntentOptions): 
   } catch (error) {
     return handleStripeError(error);
   }
+}
+
+// Determine payment method types based on selected method
+function getPaymentMethodTypes(selectedMethod?: string, enabledMethods?: string[]): string[] {
+  const allSupportedMethods = [
+    'card',
+    'bacs_debit', 
+    'klarna',
+    'afterpay_clearpay',
+    'paypal',
+    // Note: Apple Pay and Google Pay are handled through the 'card' type with special processing
+  ];
+
+  if (selectedMethod) {
+    // Map our internal method names to Stripe's payment method types
+    const methodMapping: Record<string, string> = {
+      'card': 'card',
+      'apple_pay': 'card', // Apple Pay uses card payment method type
+      'google_pay': 'card', // Google Pay uses card payment method type  
+      'paypal': 'paypal',
+      'klarna': 'klarna',
+      'clearpay': 'afterpay_clearpay',
+      'bank_transfer': 'bacs_debit',
+      'open_banking': 'bacs_debit', // Will be handled separately
+      'bacs_direct_debit': 'bacs_debit'
+    };
+
+    const stripeMethod = methodMapping[selectedMethod];
+    return stripeMethod ? [stripeMethod] : ['card'];
+  }
+
+  return enabledMethods?.filter(method => allSupportedMethods.includes(method)) || ['card'];
+}
+
+// Configure payment method options for different types
+function getPaymentMethodOptions(paymentMethodTypes: string[]): Record<string, any> {
+  const options: Record<string, any> = {};
+
+  paymentMethodTypes.forEach(type => {
+    switch (type) {
+      case 'card':
+        options.card = {
+          request_three_d_secure: 'automatic',
+          setup_future_usage: 'off_session',
+          statement_descriptor_suffix_kana: null,
+          statement_descriptor_suffix_kanji: null
+        };
+        break;
+
+      case 'bacs_debit':
+        options.bacs_debit = {
+          setup_future_usage: 'off_session'
+        };
+        break;
+
+      case 'klarna':
+        options.klarna = {
+          preferred_locale: 'en-GB',
+          capture_method: 'automatic'
+        };
+        break;
+
+      case 'afterpay_clearpay':
+        options.afterpay_clearpay = {
+          capture_method: 'automatic',
+          setup_future_usage: 'none'
+        };
+        break;
+
+      case 'paypal':
+        options.paypal = {
+          preferred_locale: 'en_GB',
+          capture_method: 'automatic'
+        };
+        break;
+    }
+  });
+
+  return options;
+}
+
+// Legacy function for backwards compatibility
+export async function createPaymentIntent(options: CreatePaymentIntentOptions): Promise<PaymentResult> {
+  return createEnhancedPaymentIntent({
+    ...options,
+    enabledMethods: ['card', 'bacs_debit']
+  });
 }
 
 // Confirm payment intent

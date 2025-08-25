@@ -18,7 +18,13 @@ export const tableSelectionSchema = z.object({
 export const paymentSchema = z.object({
   termsAccepted: z.boolean().refine(val => val === true, "You must accept the terms and conditions"),
   marketingConsent: z.boolean().optional(),
-  privacyPolicyAccepted: z.boolean().refine(val => val === true, "You must accept the privacy policy")
+  privacyPolicyAccepted: z.boolean().refine(val => val === true, "You must accept the privacy policy"),
+  
+  // Enhanced payment fields
+  paymentMethod: z.enum(['card', 'apple_pay', 'google_pay', 'paypal', 'klarna', 'clearpay', 'bank_transfer', 'open_banking', 'bacs_direct_debit']).optional(),
+  paymentIntentId: z.string().optional(),
+  paymentStatus: z.enum(['pending', 'processing', 'completed', 'failed', 'cancelled']).optional(),
+  paymentResult: z.any().optional() // This will contain the PaymentResult object
 });
 
 // Combined form data type

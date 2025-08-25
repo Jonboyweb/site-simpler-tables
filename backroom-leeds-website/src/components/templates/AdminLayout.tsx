@@ -19,6 +19,7 @@ const getNavigationForRole = (role: string) => {
       return [
         ...baseNavigation,
         { href: '/admin/bookings', label: 'Bookings', icon: '📅' },
+        { href: '/admin/floor-plan', label: 'Floor Plan', icon: '🏗️' },
         { href: '/admin/events', label: 'Events', icon: '🎉' },
         { href: '/admin/customers', label: 'Customers', icon: '👥' },
         { href: '/admin/staff', label: 'Staff', icon: '👤' },
@@ -30,6 +31,7 @@ const getNavigationForRole = (role: string) => {
       return [
         ...baseNavigation,
         { href: '/admin/bookings', label: 'Bookings', icon: '📅' },
+        { href: '/admin/floor-plan', label: 'Floor Plan', icon: '🏗️' },
         { href: '/admin/events', label: 'Events', icon: '🎉' },
         { href: '/admin/customers', label: 'Customers', icon: '👥' },
         { href: '/admin/finance', label: 'Finance', icon: '💰' },

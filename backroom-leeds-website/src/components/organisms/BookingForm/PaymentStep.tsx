@@ -4,8 +4,10 @@ import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AccessibleFormField } from '@/components/molecules/AccessibleFormField';
 import { LoadingSpinner } from '@/components/atoms/LoadingSpinner';
+import { EnhancedPaymentProcessor } from '@/components/organisms/EnhancedPaymentProcessor';
 import { cn } from '@/lib/utils';
 import type { PaymentData, CustomerDetailsData, TableSelectionData } from '@/types/booking';
+import type { PaymentResult, PaymentState } from '@/types/payment';
 import { DRINKS_PACKAGES, ARRIVAL_TIMES } from '@/types/booking';
 
 interface PaymentStepProps {
@@ -25,10 +27,13 @@ export function PaymentStep({
     register,
     formState: { errors },
     watch,
-    handleSubmit
+    handleSubmit,
+    setValue
   } = useFormContext<PaymentData & CustomerDetailsData & TableSelectionData>();
 
   const [showFullTerms, setShowFullTerms] = useState(false);
+  const [showPaymentProcessor, setShowPaymentProcessor] = useState(false);
+  const [paymentState, setPaymentState] = useState<PaymentState>('idle');
   
   // Watch form values for summary
   const formData = watch();
@@ -42,12 +47,35 @@ export function PaymentStep({
   const termsAccepted = watch('termsAccepted');
   const privacyAccepted = watch('privacyPolicyAccepted');
 
-  const canSubmit = termsAccepted && privacyAccepted && !isSubmitting;
+  const canProceedToPayment = termsAccepted && privacyAccepted && !isSubmitting;
 
   const handleFormSubmit = (data: Record<string, unknown>) => {
-    if (canSubmit) {
-      onSubmit?.(data);
+    if (canProceedToPayment && !showPaymentProcessor) {
+      // Show the payment processor instead of submitting immediately
+      setShowPaymentProcessor(true);
     }
+  };
+
+  const handlePaymentSuccess = (result: PaymentResult) => {
+    // Payment successful, now submit the form with payment data
+    const formDataWithPayment = {
+      ...formData,
+      paymentResult: result,
+      paymentIntentId: result.paymentIntent?.id,
+      paymentMethod: result.paymentIntent?.paymentMethod,
+      paymentStatus: 'completed'
+    };
+    
+    onSubmit?.(formDataWithPayment);
+  };
+
+  const handlePaymentError = (error: string) => {
+    console.error('Payment error:', error);
+    // Keep the payment processor open so user can try again
+  };
+
+  const handlePaymentStateChange = (state: PaymentState) => {
+    setPaymentState(state);
   };
 
   return (
@@ -259,51 +287,99 @@ export function PaymentStep({
         </div>
       </section>
 
-      {/* Payment Processing Notice */}
-      <section className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
-          <div className="text-yellow-600 mt-1">🔒</div>
-          <div className="text-sm text-yellow-800">
-            <h4 className="font-medium mb-1">Secure Payment Processing</h4>
-            <p>
-              Your payment is processed securely by Stripe. Your card details are encrypted and never stored on our servers. 
-              You may be asked to complete additional security verification (3D Secure) as required by UK regulations.
+      {/* Enhanced Payment Processor or Continue Button */}
+      {showPaymentProcessor ? (
+        <section className="space-y-6">
+          <div className="text-center">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Complete Your Payment
+            </h3>
+            <p className="text-gray-600">
+              Choose your preferred payment method to secure your booking
             </p>
           </div>
-        </div>
-      </section>
+          
+          <EnhancedPaymentProcessor
+            amount={totalAmount * 100} // Convert to pence
+            currency="GBP"
+            region="GB"
+            description={`The Backroom Leeds - Table Booking - ${selectedPackage?.name}`}
+            customerEmail={formData.email}
+            customerName={formData.name}
+            bookingRef={`TBL-${Date.now()}`} // This should come from the booking creation
+            billingAddress={{
+              line1: 'Address Line 1', // You might want to collect this in customer details
+              city: 'Leeds',
+              postcode: 'LS1 1AA',
+              country: 'GB'
+            }}
+            onSuccess={handlePaymentSuccess}
+            onError={handlePaymentError}
+            onStateChange={handlePaymentStateChange}
+            disabled={isSubmitting || paymentState === 'processing'}
+            className="max-w-none"
+          />
+          
+          {/* Back to terms button */}
+          <div className="text-center pt-4">
+            <button
+              type="button"
+              onClick={() => setShowPaymentProcessor(false)}
+              disabled={paymentState === 'processing' || paymentState === 'succeeded'}
+              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+            >
+              ← Back to booking details
+            </button>
+          </div>
+        </section>
+      ) : (
+        <section className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <div className="text-yellow-600 mt-1">🔒</div>
+            <div className="text-sm text-yellow-800">
+              <h4 className="font-medium mb-1">Multiple Payment Options Available</h4>
+              <p>
+                We accept cards, digital wallets (Apple Pay, Google Pay), buy-now-pay-later options (Klarna, Clearpay), 
+                and UK bank transfers. All payments are processed securely with industry-leading encryption.
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
 
-      {/* Submit Button */}
-      <div className="text-center pt-4">
-        <button
-          type="submit"
-          disabled={!canSubmit}
-          onClick={handleSubmit(handleFormSubmit)}
-          className={cn(
-            'w-full max-w-md px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-200',
-            'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500',
-            {
-              'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl': canSubmit && !isSubmitting,
-              'bg-gray-300 text-gray-500 cursor-not-allowed': !canSubmit || isSubmitting
-            }
-          )}
-          aria-describedby="submit-button-description"
-        >
-          {isSubmitting ? (
-            <span className="flex items-center justify-center gap-3">
-              <LoadingSpinner size="sm" />
-              Processing Payment...
-            </span>
-          ) : (
-            `Pay £${depositAmount} Deposit & Confirm Booking`
-          )}
-        </button>
-        
-        <div id="submit-button-description" className="mt-2 text-sm text-gray-600">
-          {!canSubmit && !isSubmitting && 'Please accept the terms and privacy policy to continue'}
-          {canSubmit && !isSubmitting && `Secure payment of £${depositAmount} deposit`}
+      {/* Continue to Payment Button (only show when not in payment processor) */}
+      {!showPaymentProcessor && (
+        <div className="text-center pt-4">
+          <button
+            type="button"
+            disabled={!canProceedToPayment}
+            onClick={handleSubmit(handleFormSubmit)}
+            className={cn(
+              'w-full max-w-md px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-200',
+              'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500',
+              {
+                'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl': canProceedToPayment && !isSubmitting,
+                'bg-gray-300 text-gray-500 cursor-not-allowed': !canProceedToPayment || isSubmitting
+              }
+            )}
+            aria-describedby="continue-button-description"
+          >
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-3">
+                <LoadingSpinner size="sm" />
+                Please wait...
+              </span>
+            ) : (
+              'Continue to Payment Options →'
+            )}
+          </button>
+          
+          <div id="continue-button-description" className="mt-2 text-sm text-gray-600">
+            {!canProceedToPayment && !isSubmitting && 'Please accept the terms and privacy policy to continue'}
+            {canProceedToPayment && !isSubmitting && 'Choose from multiple secure payment options'}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
