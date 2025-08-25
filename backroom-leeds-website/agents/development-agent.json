@@ -1,0 +1,317 @@
+{
+  "name": "backroom-development-agent",
+  "version": "1.0.0",
+  "model": "claude-sonnet-4-20250514",
+  "persona": "frontend",
+  "description": "Advanced full-stack development agent for Backroom Leeds venue platform implementation",
+  
+  "capabilities": {
+    "frontend_development": {
+      "react_nextjs": true,
+      "typescript_development": true,
+      "tailwind_css_styling": true,
+      "component_architecture": true,
+      "state_management": true,
+      "performance_optimization": true
+    },
+    "backend_development": {
+      "api_development": true,
+      "database_integration": true,
+      "authentication_systems": true,
+      "payment_processing": true,
+      "real_time_features": true,
+      "third_party_integrations": true
+    },
+    "venue_specific_features": {
+      "booking_system": true,
+      "event_management": true,
+      "customer_portal": true,
+      "admin_dashboard": true,
+      "notification_systems": true,
+      "analytics_integration": true
+    },
+    "quality_assurance": {
+      "testing_implementation": true,
+      "accessibility_compliance": true,
+      "performance_monitoring": true,
+      "error_handling": true,
+      "code_quality": true,
+      "documentation": true
+    }
+  },
+
+  "configuration": {
+    "model": "claude-sonnet-4-20250514",
+    "context_window": 1000000,
+    "working_directory": "./src",
+    "enable_beta_features": true,
+    "depends_on": ["backroom-architecture-agent"],
+    "development_mode": "full_stack",
+    "code_generation": "production_ready",
+    "testing_integration": "comprehensive"
+  },
+
+  "tools": {
+    "primary": [
+      "Magic",
+      "Context7", 
+      "Edit",
+      "MultiEdit",
+      "Write"
+    ],
+    "secondary": [
+      "Read",
+      "Sequential",
+      "Bash",
+      "Task"
+    ],
+    "development": [
+      "Grep",
+      "Glob",
+      "TodoWrite"
+    ],
+    "quality": [
+      "Playwright"
+    ]
+  },
+
+  "development_stack": {
+    "frontend": {
+      "framework": "Next.js 15 with App Router",
+      "language": "TypeScript",
+      "styling": "Tailwind CSS 4.1 with custom prohibition theme",
+      "components": "shadcn/ui with Art Deco customization",
+      "state_management": "Zustand + React Query",
+      "forms": "React Hook Form + Zod validation",
+      "animation": "Framer Motion for Art Deco transitions"
+    },
+    "backend": {
+      "runtime": "Node.js with TypeScript",
+      "api_framework": "Next.js API routes",
+      "database": "PostgreSQL with Prisma ORM",
+      "authentication": "NextAuth.js with JWT",
+      "caching": "Redis for session and data caching",
+      "file_storage": "Vercel Blob for media assets"
+    },
+    "infrastructure": {
+      "hosting": "Vercel for full-stack deployment",
+      "database": "Supabase PostgreSQL",
+      "cdn": "Vercel Edge Network",
+      "monitoring": "Sentry + Vercel Analytics",
+      "email": "Resend for transactional emails"
+    }
+  },
+
+  "feature_domains": {
+    "booking_system": {
+      "components": [
+        "table_selector",
+        "date_time_picker", 
+        "guest_counter",
+        "special_requests_form",
+        "booking_confirmation",
+        "booking_management"
+      ],
+      "backend": [
+        "availability_engine",
+        "reservation_processor",
+        "conflict_resolver",
+        "waitlist_manager",
+        "booking_notifications"
+      ]
+    },
+    "event_management": {
+      "components": [
+        "event_calendar",
+        "event_details",
+        "ticket_booking",
+        "artist_profiles",
+        "event_gallery"
+      ],
+      "backend": [
+        "event_scheduler",
+        "capacity_manager",
+        "ticket_system",
+        "artist_booking_api",
+        "event_analytics"
+      ]
+    },
+    "customer_experience": {
+      "components": [
+        "customer_profile",
+        "booking_history",
+        "preference_settings",
+        "loyalty_dashboard",
+        "notification_center"
+      ],
+      "backend": [
+        "customer_service",
+        "preference_engine",
+        "loyalty_system",
+        "communication_api",
+        "analytics_tracking"
+      ]
+    },
+    "admin_interface": {
+      "components": [
+        "venue_dashboard",
+        "booking_management",
+        "event_administration",
+        "customer_insights",
+        "staff_tools"
+      ],
+      "backend": [
+        "admin_authentication",
+        "venue_management_api",
+        "reporting_system",
+        "staff_scheduling",
+        "inventory_tracking"
+      ]
+    }
+  },
+
+  "development_patterns": {
+    "component_architecture": {
+      "atomic_design": "Atoms, molecules, organisms, templates, pages",
+      "component_structure": "Components organized by feature and complexity",
+      "reusability": "Maximum component reuse with prop customization",
+      "accessibility": "WCAG 2.1 AA compliance built into components"
+    },
+    "state_management": {
+      "global_state": "Zustand for app-wide state (user, booking, theme)",
+      "server_state": "React Query for API data management",
+      "local_state": "React hooks for component-specific state",
+      "form_state": "React Hook Form for complex form handling"
+    },
+    "api_design": {
+      "rest_apis": "RESTful endpoints with proper HTTP methods",
+      "real_time": "WebSocket connections for live updates",
+      "validation": "Zod schemas for request/response validation", 
+      "error_handling": "Consistent error responses with logging"
+    },
+    "database_patterns": {
+      "schema_design": "Normalized tables with optimized relationships",
+      "query_optimization": "Efficient queries with proper indexing",
+      "data_migration": "Version-controlled schema migrations",
+      "backup_strategy": "Automated backups with point-in-time recovery"
+    }
+  },
+
+  "quality_standards": {
+    "code_quality": {
+      "typescript_strict": "Strict TypeScript configuration",
+      "eslint_rules": "Next.js recommended + custom rules",
+      "prettier_formatting": "Consistent code formatting",
+      "import_organization": "Organized imports with path mapping"
+    },
+    "testing_strategy": {
+      "unit_tests": "Jest + React Testing Library (>80% coverage)",
+      "integration_tests": "API endpoint testing (100% coverage)",
+      "e2e_tests": "Playwright for user workflows",
+      "visual_tests": "Component visual regression testing"
+    },
+    "performance_optimization": {
+      "core_web_vitals": "LCP <2.5s, FID <100ms, CLS <0.1",
+      "bundle_optimization": "Code splitting and tree shaking",
+      "image_optimization": "Next.js Image component with WebP",
+      "caching_strategy": "Redis caching with TTL optimization"
+    },
+    "accessibility_compliance": {
+      "wcag_2_1_aa": "Full compliance with automated testing",
+      "keyboard_navigation": "Full keyboard accessibility",
+      "screen_readers": "ARIA labels and semantic HTML",
+      "color_contrast": "4.5:1 minimum contrast ratio"
+    }
+  },
+
+  "development_workflows": {
+    "feature_development": {
+      "planning": "Architecture agent consultation for design",
+      "implementation": "Component-first development approach",
+      "testing": "Test-driven development with full coverage",
+      "review": "Code review with quality gates",
+      "deployment": "Automated CI/CD with staging validation"
+    },
+    "component_creation": {
+      "design_system": "shadcn/ui base with prohibition customization",
+      "accessibility": "Built-in WCAG compliance",
+      "responsiveness": "Mobile-first responsive design",
+      "theming": "Art Deco theme integration",
+      "testing": "Component testing with user interactions"
+    },
+    "api_development": {
+      "schema_first": "OpenAPI specification before implementation",
+      "validation": "Input/output validation with Zod",
+      "error_handling": "Comprehensive error responses",
+      "documentation": "Auto-generated API documentation",
+      "testing": "Integration tests with database mocking"
+    }
+  },
+
+  "integration_dependencies": {
+    "architecture_agent_integration": {
+      "system_design": "Implementation follows architectural blueprints",
+      "technology_stack": "Uses architecture-approved technologies",
+      "patterns": "Implements architectural patterns correctly",
+      "quality_attributes": "Meets performance and security requirements"
+    },
+    "cross_agent_collaboration": {
+      "ui_specialist": "Component design and styling collaboration",
+      "api_specialist": "Backend implementation coordination",
+      "security_specialist": "Security implementation validation",
+      "testing_specialist": "Testing strategy and implementation",
+      "performance_specialist": "Performance optimization integration"
+    }
+  },
+
+  "development_automation": {
+    "code_generation": {
+      "component_scaffolding": "Automated component structure creation",
+      "api_endpoint_generation": "CRUD endpoint generation from schemas",
+      "type_definitions": "TypeScript types from database schemas",
+      "test_templates": "Automated test file generation"
+    },
+    "quality_automation": {
+      "pre_commit_hooks": "Linting, formatting, and testing",
+      "ci_cd_pipeline": "Automated testing and deployment",
+      "code_coverage": "Coverage reporting and enforcement",
+      "security_scanning": "Automated vulnerability detection"
+    }
+  },
+
+  "venue_business_logic": {
+    "booking_rules": {
+      "availability_calculation": "Real-time table availability",
+      "booking_constraints": "Time slots, party size, special events",
+      "pricing_logic": "Dynamic pricing based on demand",
+      "cancellation_policy": "Flexible cancellation with penalties"
+    },
+    "event_management": {
+      "scheduling_logic": "Event calendar with conflict detection",
+      "capacity_management": "Occupancy limits and fire safety",
+      "ticket_allocation": "Reserved vs. general admission",
+      "artist_coordination": "Performance scheduling and requirements"
+    },
+    "customer_relationship": {
+      "loyalty_system": "Points-based rewards and VIP tiers",
+      "personalization": "Preferences and recommendation engine",
+      "communication": "Multi-channel notification system",
+      "feedback_collection": "Review and rating aggregation"
+    }
+  },
+
+  "output_formats": {
+    "production_code": {
+      "clean_architecture": "Well-structured, maintainable code",
+      "comprehensive_documentation": "Inline and external documentation",
+      "error_handling": "Robust error boundaries and recovery",
+      "performance_optimized": "Optimized for speed and efficiency"
+    },
+    "development_deliverables": {
+      "component_library": "Reusable UI component collection",
+      "api_documentation": "Complete API reference with examples",
+      "testing_suite": "Comprehensive test coverage",
+      "deployment_guides": "Step-by-step deployment instructions"
+    }
+  }
+}

@@ -1,0 +1,197 @@
+{
+  "workflow": {
+    "name": "backroom-development-workflow",
+    "version": "1.0.0",
+    "description": "Development workflow for Backroom Leeds premium speakeasy website",
+    "type": "development"
+  },
+  
+  "context": {
+    "project": "backroom-leeds-website",
+    "framework": "next.js",
+    "theme": "prohibition-speakeasy",
+    "venue_type": "premium_speakeasy",
+    "location": "Leeds_UK"
+  },
+
+  "stages": {
+    "1_discovery": {
+      "name": "Research & Discovery",
+      "agent": "research-agent",
+      "tasks": [
+        "market_analysis",
+        "competitive_intelligence", 
+        "customer_insights",
+        "technical_benchmarks"
+      ],
+      "outputs": ["research-report.md", "requirements.md"],
+      "quality_gates": ["stakeholder_approval"]
+    },
+
+    "2_architecture": {
+      "name": "System Architecture",
+      "agent": "architecture-agent", 
+      "depends_on": ["1_discovery"],
+      "tasks": [
+        "system_design",
+        "component_architecture",
+        "data_modeling",
+        "integration_planning"
+      ],
+      "outputs": ["architecture-docs", "component-specs"],
+      "quality_gates": ["technical_review", "scalability_validation"]
+    },
+
+    "3_development": {
+      "name": "Development & Implementation",
+      "agent": "development-agent",
+      "depends_on": ["2_architecture"],
+      "tasks": [
+        "component_development",
+        "api_implementation", 
+        "integration_work",
+        "feature_implementation"
+      ],
+      "outputs": ["source_code", "api_endpoints"],
+      "quality_gates": ["code_review", "typescript_validation", "eslint_clean"]
+    },
+
+    "4_testing": {
+      "name": "Quality Assurance",
+      "agent": "testing-agent",
+      "depends_on": ["3_development"],
+      "tasks": [
+        "unit_testing",
+        "integration_testing",
+        "e2e_testing",
+        "accessibility_testing",
+        "performance_testing"
+      ],
+      "outputs": ["test_suites", "coverage_reports", "performance_reports"],
+      "quality_gates": ["test_coverage_80", "accessibility_compliance", "performance_benchmarks"]
+    },
+
+    "5_documentation": {
+      "name": "Documentation",
+      "agent": "documentation-agent",
+      "depends_on": ["3_development", "4_testing"],
+      "tasks": [
+        "api_documentation",
+        "user_guides", 
+        "technical_documentation",
+        "deployment_guides"
+      ],
+      "outputs": ["docs", "user_guides", "api_docs"],
+      "quality_gates": ["documentation_completeness", "clarity_review"]
+    }
+  },
+
+  "specialists": {
+    "ui_specialist": {
+      "activation": "auto",
+      "scope": ["component_development", "styling", "responsive_design"],
+      "quality_gates": ["WCAG_2.1_AA", "mobile_first", "design_system_compliance"]
+    },
+    
+    "api_specialist": {
+      "activation": "auto", 
+      "scope": ["api_development", "data_integration", "backend_services"],
+      "quality_gates": ["api_documentation", "security_compliance", "performance_targets"]
+    },
+    
+    "security_specialist": {
+      "activation": "auto",
+      "scope": ["security_review", "vulnerability_assessment", "compliance_check"],
+      "quality_gates": ["OWASP_compliance", "authentication_security", "data_protection"]
+    },
+    
+    "performance_specialist": {
+      "activation": "conditional",
+      "scope": ["performance_optimization", "load_testing", "monitoring"],
+      "quality_gates": ["core_web_vitals", "lighthouse_90", "load_test_pass"]
+    }
+  },
+
+  "quality_framework": {
+    "code_quality": {
+      "typescript_strict": true,
+      "eslint_config": "next",
+      "prettier_formatting": true,
+      "test_coverage_minimum": 80
+    },
+    
+    "performance": {
+      "core_web_vitals": "good",
+      "lighthouse_minimum": 90,
+      "bundle_size_budget": "500kb",
+      "first_contentful_paint": "<2s"
+    },
+    
+    "accessibility": {
+      "wcag_level": "AA",
+      "keyboard_navigation": true,
+      "screen_reader_support": true,
+      "color_contrast_ratio": "4.5:1"
+    },
+    
+    "security": {
+      "owasp_compliance": true,
+      "authentication": "required",
+      "data_encryption": "at_rest_and_transit",
+      "security_headers": "complete"
+    }
+  },
+
+  "automation": {
+    "pre_commit_hooks": [
+      "lint",
+      "type_check",
+      "test_unit",
+      "security_scan"
+    ],
+    
+    "ci_pipeline": [
+      "build",
+      "test_all",
+      "security_scan",
+      "accessibility_check",
+      "performance_audit"
+    ],
+    
+    "deployment": {
+      "staging_auto": true,
+      "production_manual": true,
+      "rollback_automatic": true
+    }
+  },
+
+  "tools": {
+    "mcp_servers": [
+      "Context7",
+      "Sequential", 
+      "Magic",
+      "Playwright"
+    ],
+    
+    "development": [
+      "next.js",
+      "typescript",
+      "tailwindcss",
+      "eslint"
+    ],
+    
+    "testing": [
+      "jest",
+      "playwright",
+      "lighthouse",
+      "axe-core"
+    ]
+  },
+
+  "monitoring": {
+    "progress_tracking": true,
+    "quality_metrics": true,
+    "performance_monitoring": true,
+    "error_tracking": true
+  }
+}

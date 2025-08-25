@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:wght@400;500;600;700&family=Great+Vibes&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@theme {
+  --color-speakeasy-noir: oklch(8% 0.02 240);
+  --color-speakeasy-burgundy: oklch(25% 0.15 15);
+  --color-speakeasy-gold: oklch(76.9% 0.188 70.08);
+  --color-speakeasy-copper: oklch(55% 0.12 45);
+  --color-speakeasy-champagne: oklch(95% 0.05 85);
+}
+
+:root {
+  --background: oklch(8% 0.02 240);
+  --foreground: oklch(95% 0.05 85);
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-image: radial-gradient(circle at 20% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(107, 15, 26, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 40%, rgba(184, 115, 51, 0.05) 0%, transparent 50%);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: oklch(76.9% 0.188 70.08);
+  }
+}
+
+@layer components {
+  .art-deco-border {
+    position: relative;
+  }
+  
+  .art-deco-border::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, 
+      oklch(76.9% 0.188 70.08), 
+      oklch(55% 0.12 45), 
+      oklch(76.9% 0.188 70.08)
+    );
+    border-radius: inherit;
+    z-index: -1;
+  }
+  
+  .sunburst-bg {
+    background: conic-gradient(
+      from 0deg at 50% 0%,
+      oklch(76.9% 0.188 70.08) 0deg,
+      oklch(55% 0.12 45) 60deg,
+      oklch(76.9% 0.188 70.08) 120deg,
+      oklch(55% 0.12 45) 180deg,
+      oklch(76.9% 0.188 70.08) 240deg,
+      oklch(55% 0.12 45) 300deg,
+      oklch(76.9% 0.188 70.08) 360deg
+    );
+  }
+  
+  .vintage-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .vintage-hover:hover {
+    transform: perspective(1000px) rotateX(5deg) scale(1.02);
+    box-shadow: 0 20px 40px rgba(107, 15, 26, 0.3);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .neon-glow {
+    filter: drop-shadow(0 0 10px currentColor) drop-shadow(0 0 20px currentColor);
+  }
+  
+  .vintage-grain {
+    background-image: 
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255, 255, 255, 0.03) 2px,
+        rgba(255, 255, 255, 0.03) 4px
+      );
+  }
+}

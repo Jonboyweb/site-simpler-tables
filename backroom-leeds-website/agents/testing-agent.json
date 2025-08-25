@@ -1,0 +1,342 @@
+{
+  "name": "backroom-testing-agent",
+  "version": "1.0.0",
+  "model": "claude-3-5-haiku-20241022",
+  "persona": "qa",
+  "description": "High-volume testing specialist for Backroom Leeds venue platform quality assurance",
+  
+  "capabilities": {
+    "automated_testing": {
+      "unit_testing": true,
+      "integration_testing": true,
+      "e2e_testing": true,
+      "visual_regression": true,
+      "performance_testing": true,
+      "accessibility_testing": true
+    },
+    "test_generation": {
+      "test_scaffolding": true,
+      "test_data_generation": true,
+      "mock_creation": true,
+      "fixture_management": true,
+      "scenario_creation": true,
+      "edge_case_detection": true
+    },
+    "quality_assurance": {
+      "code_coverage_analysis": true,
+      "test_optimization": true,
+      "failure_analysis": true,
+      "regression_detection": true,
+      "performance_monitoring": true,
+      "accessibility_auditing": true
+    },
+    "venue_testing": {
+      "booking_flow_testing": true,
+      "payment_processing_testing": true,
+      "event_management_testing": true,
+      "customer_portal_testing": true,
+      "admin_dashboard_testing": true,
+      "real_time_feature_testing": true
+    }
+  },
+
+  "configuration": {
+    "model": "claude-3-5-haiku-20241022",
+    "working_directory": "./tests",
+    "high_volume_mode": true,
+    "depends_on": ["backroom-development-agent"],
+    "test_execution": "parallel",
+    "coverage_target": 90,
+    "performance_optimized": true,
+    "batch_processing": true
+  },
+
+  "tools": {
+    "primary": [
+      "Playwright",
+      "Bash",
+      "Write",
+      "Read"
+    ],
+    "secondary": [
+      "Edit",
+      "MultiEdit",
+      "Grep",
+      "Glob"
+    ],
+    "analysis": [
+      "Sequential",
+      "TodoWrite"
+    ],
+    "coordination": [
+      "Task"
+    ]
+  },
+
+  "testing_frameworks": {
+    "unit_testing": {
+      "framework": "Jest with React Testing Library",
+      "config": "jest.config.js with custom matchers",
+      "coverage": "Istanbul with threshold enforcement",
+      "mocking": "Jest mocks with MSW for API mocking",
+      "parallel_execution": "Jest workers for performance"
+    },
+    "integration_testing": {
+      "framework": "Jest with Supertest for API testing",
+      "database": "Test database with data seeding",
+      "authentication": "Mock auth providers and JWT tokens",
+      "external_apis": "MSW for third-party service mocking",
+      "environment": "Isolated test containers"
+    },
+    "e2e_testing": {
+      "framework": "Playwright with TypeScript",
+      "browsers": "Chromium, Firefox, Safari (WebKit)",
+      "mobile": "Device emulation for mobile testing",
+      "visual": "Screenshot comparison and diff analysis",
+      "parallel": "Sharded execution across multiple workers"
+    },
+    "performance_testing": {
+      "framework": "Playwright + Lighthouse CI",
+      "metrics": "Core Web Vitals and performance budgets",
+      "load_testing": "Artillery.js for API load testing",
+      "monitoring": "Continuous performance regression detection",
+      "reporting": "Performance dashboards and alerts"
+    }
+  },
+
+  "test_categories": {
+    "booking_system_tests": {
+      "availability_engine": [
+        "real_time_availability_calculation",
+        "overbooking_prevention",
+        "concurrent_booking_conflicts",
+        "table_capacity_validation",
+        "time_slot_restrictions"
+      ],
+      "reservation_flow": [
+        "multi_step_booking_form",
+        "guest_information_validation",
+        "special_requests_handling",
+        "payment_processing_integration",
+        "confirmation_email_delivery"
+      ],
+      "booking_management": [
+        "reservation_modifications",
+        "cancellation_processing",
+        "waitlist_management",
+        "no_show_handling",
+        "group_booking_scenarios"
+      ]
+    },
+    "event_management_tests": {
+      "event_scheduling": [
+        "calendar_integration_testing",
+        "event_conflict_detection",
+        "capacity_management_validation",
+        "recurring_event_handling",
+        "time_zone_handling"
+      ],
+      "ticketing_system": [
+        "ticket_allocation_logic",
+        "pricing_tier_validation",
+        "sold_out_scenarios",
+        "refund_processing",
+        "group_discount_application"
+      ],
+      "artist_management": [
+        "performance_scheduling",
+        "technical_requirements",
+        "contract_management",
+        "payment_processing",
+        "availability_coordination"
+      ]
+    },
+    "customer_experience_tests": {
+      "user_authentication": [
+        "registration_flow_validation",
+        "login_security_testing",
+        "password_reset_functionality",
+        "social_auth_integration",
+        "session_management"
+      ],
+      "profile_management": [
+        "preference_setting_persistence",
+        "dietary_requirements_handling",
+        "communication_preferences",
+        "data_privacy_compliance",
+        "account_deletion_workflow"
+      ],
+      "loyalty_system": [
+        "points_calculation_accuracy",
+        "tier_progression_logic",
+        "reward_redemption_process",
+        "exclusive_offer_access",
+        "referral_program_tracking"
+      ]
+    },
+    "admin_interface_tests": {
+      "venue_management": [
+        "table_layout_configuration",
+        "capacity_settings_validation",
+        "operating_hours_management",
+        "special_event_setup",
+        "staff_scheduling_interface"
+      ],
+      "reporting_analytics": [
+        "booking_revenue_reports",
+        "customer_analytics_accuracy",
+        "event_performance_metrics",
+        "staff_productivity_tracking",
+        "financial_reconciliation"
+      ],
+      "administrative_functions": [
+        "user_role_management",
+        "system_configuration_changes",
+        "data_export_functionality",
+        "audit_log_generation",
+        "backup_restore_procedures"
+      ]
+    }
+  },
+
+  "high_volume_optimizations": {
+    "parallel_execution": {
+      "jest_workers": "Utilize all available CPU cores",
+      "playwright_sharding": "Distribute E2E tests across workers",
+      "test_splitting": "Smart test file distribution",
+      "resource_management": "Memory and CPU optimization"
+    },
+    "test_efficiency": {
+      "selective_testing": "Run only affected tests for changes",
+      "test_prioritization": "Critical path tests first",
+      "fast_feedback": "Unit tests complete within 30 seconds",
+      "incremental_testing": "Cache test results for unchanged code"
+    },
+    "batch_processing": {
+      "test_data_generation": "Bulk test data creation",
+      "fixture_loading": "Efficient test fixture management",
+      "database_seeding": "Optimized data setup and teardown",
+      "screenshot_batching": "Parallel visual comparison"
+    }
+  },
+
+  "quality_gates": {
+    "coverage_requirements": {
+      "unit_tests": "90% line coverage minimum",
+      "integration_tests": "85% API endpoint coverage",
+      "e2e_tests": "100% critical user journey coverage",
+      "accessibility_tests": "100% WCAG 2.1 AA compliance"
+    },
+    "performance_thresholds": {
+      "unit_test_execution": "<30 seconds total runtime",
+      "integration_tests": "<5 minutes total runtime", 
+      "e2e_test_suite": "<15 minutes for full suite",
+      "performance_tests": "Core Web Vitals within targets"
+    },
+    "quality_metrics": {
+      "test_reliability": ">98% success rate on repeated runs",
+      "flaky_test_tolerance": "<2% flaky test rate",
+      "test_maintainability": "Clear test naming and documentation",
+      "failure_diagnostics": "Detailed error reporting and debugging"
+    }
+  },
+
+  "test_data_management": {
+    "data_generation": {
+      "booking_scenarios": "Realistic booking patterns and edge cases",
+      "customer_profiles": "Diverse user demographics and preferences",
+      "event_data": "Various event types and configurations",
+      "payment_scenarios": "Success, failure, and edge case transactions"
+    },
+    "fixture_management": {
+      "database_fixtures": "Consistent test data across test runs",
+      "api_mocks": "Realistic API response simulation",
+      "file_fixtures": "Image and document test assets",
+      "configuration_fixtures": "Environment-specific settings"
+    },
+    "data_cleanup": {
+      "test_isolation": "Clean state between test runs",
+      "database_reset": "Automated test database cleanup",
+      "file_cleanup": "Temporary file removal",
+      "cache_clearing": "Redis and application cache clearing"
+    }
+  },
+
+  "accessibility_testing": {
+    "automated_audits": {
+      "axe_core_integration": "Comprehensive accessibility scanning",
+      "lighthouse_audits": "Automated accessibility scoring",
+      "color_contrast_checking": "WCAG contrast ratio validation",
+      "keyboard_navigation": "Tab order and focus management"
+    },
+    "manual_testing": {
+      "screen_reader_testing": "NVDA, JAWS, VoiceOver compatibility",
+      "keyboard_only_navigation": "Full functionality without mouse",
+      "zoom_testing": "200% zoom level functionality",
+      "cognitive_accessibility": "Clear language and error messaging"
+    },
+    "compliance_validation": {
+      "wcag_2_1_aa": "Full compliance verification",
+      "section_508": "Government accessibility standards",
+      "ada_compliance": "Americans with Disabilities Act requirements",
+      "european_standards": "EN 301 549 compliance"
+    }
+  },
+
+  "venue_specific_scenarios": {
+    "peak_load_scenarios": {
+      "high_traffic_booking": "Friday/Saturday night booking rushes",
+      "event_ticket_sales": "Popular event ticket release scenarios",
+      "system_degradation": "Graceful failure under extreme load",
+      "recovery_testing": "System recovery after outages"
+    },
+    "business_edge_cases": {
+      "last_minute_cancellations": "Same-day booking modifications",
+      "weather_event_impacts": "Event cancellation and rebooking",
+      "staff_shortage_scenarios": "Reduced capacity operations",
+      "payment_processing_failures": "Alternative payment method handling"
+    },
+    "seasonal_variations": {
+      "holiday_booking_patterns": "Christmas and New Year scenarios",
+      "summer_event_schedules": "Outdoor event management",
+      "quiet_period_operations": "Low-demand period testing",
+      "special_event_coordination": "Private hire and corporate events"
+    }
+  },
+
+  "reporting_and_analytics": {
+    "test_reporting": {
+      "coverage_reports": "Detailed line and branch coverage",
+      "performance_reports": "Test execution time analysis",
+      "failure_analysis": "Root cause analysis for failures",
+      "trend_analysis": "Test health over time tracking"
+    },
+    "quality_dashboards": {
+      "real_time_metrics": "Live test execution status",
+      "historical_trends": "Quality metrics over time",
+      "regression_tracking": "New bug introduction monitoring",
+      "team_productivity": "Testing velocity and effectiveness"
+    },
+    "ci_cd_integration": {
+      "build_pipeline_gates": "Automated quality gates",
+      "deployment_blocking": "Failed test deployment prevention",
+      "slack_notifications": "Team alerts for critical failures",
+      "github_integration": "PR status checks and comments"
+    }
+  },
+
+  "integration_dependencies": {
+    "development_agent_integration": {
+      "code_change_detection": "Automatic test execution for code changes",
+      "component_test_generation": "Auto-generate tests for new components",
+      "api_test_synchronization": "Keep API tests current with implementation",
+      "performance_validation": "Validate development against performance targets"
+    },
+    "cross_agent_collaboration": {
+      "architecture_agent": "Validate implementation against architectural requirements",
+      "security_agent": "Security testing coordination and validation",
+      "ui_specialist": "Component and accessibility testing collaboration",
+      "api_specialist": "Backend API testing and integration validation"
+    }
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "version": "1.0.0",
+  "project": "backroom-leeds-website",
+  "framework": "next.js",
+  "theme": "prohibition-speakeasy",
+  
+  "agents": {
+    "ui-specialist": {
+      "file": "ui-specialist.yaml",
+      "priority": 10,
+      "auto_activation": true,
+      "dependencies": ["design-system", "accessibility"]
+    },
+    "api-specialist": {
+      "file": "api-specialist.yaml", 
+      "priority": 9,
+      "auto_activation": true,
+      "dependencies": ["security", "database"]
+    },
+    "testing-specialist": {
+      "file": "testing-specialist.yaml",
+      "priority": 8,
+      "auto_activation": false,
+      "dependencies": ["ui-specialist", "api-specialist"]
+    },
+    "content-specialist": {
+      "file": "content-specialist.yaml",
+      "priority": 7,
+      "auto_activation": true,
+      "dependencies": ["seo", "brand-voice"]
+    },
+    "security-specialist": {
+      "file": "security-specialist.yaml",
+      "priority": 10,
+      "auto_activation": true,
+      "dependencies": ["compliance", "threat-modeling"]
+    },
+    "performance-specialist": {
+      "file": "performance-specialist.yaml",
+      "priority": 8,
+      "auto_activation": false,
+      "dependencies": ["monitoring", "optimization"]
+    },
+    "research-agent": {
+      "file": "research-agent.yaml",
+      "config": "research-agent.json", 
+      "priority": 9,
+      "auto_activation": true,
+      "model": "claude-sonnet-4-20250514",
+      "context_window": 1000000,
+      "beta_features": true,
+      "working_directory": "./research",
+      "dependencies": ["market_intelligence", "competitive_analysis", "strategic_planning"]
+    },
+    "architecture-agent": {
+      "file": "architecture-agent.yaml",
+      "config": "architecture-agent.json",
+      "priority": 10,
+      "auto_activation": true,
+      "model": "claude-opus-4-1-20250805",
+      "extended_reasoning": true,
+      "working_directory": "./architecture",
+      "depends_on": ["backroom-research-agent"],
+      "dependencies": ["system_design", "scalability_planning", "technology_selection", "integration_architecture"]
+    },
+    "development-agent": {
+      "file": "development-agent.yaml",
+      "config": "development-agent.json",
+      "priority": 9,
+      "auto_activation": true,
+      "model": "claude-sonnet-4-20250514",
+      "context_window": 1000000,
+      "enable_beta_features": true,
+      "working_directory": "./src",
+      "depends_on": ["backroom-architecture-agent"],
+      "dependencies": ["component_development", "api_implementation", "testing_integration", "performance_optimization"]
+    },
+    "testing-agent": {
+      "file": "testing-agent.yaml",
+      "config": "testing-agent.json",
+      "priority": 8,
+      "auto_activation": true,
+      "model": "claude-3-5-haiku-20241022",
+      "high_volume_mode": true,
+      "working_directory": "./tests",
+      "depends_on": ["backroom-development-agent"],
+      "dependencies": ["quality_assurance", "test_automation", "accessibility_compliance", "performance_validation"]
+    },
+    "documentation-agent": {
+      "file": "documentation-agent.yaml", 
+      "config": "documentation-agent.json",
+      "priority": 7,
+      "auto_activation": true,
+      "model": "claude-3-5-haiku-20241022",
+      "fast_generation": true,
+      "working_directory": "./docs",
+      "depends_on": ["backroom-development-agent", "backroom-testing-agent"],
+      "dependencies": ["technical_documentation", "user_guides", "api_documentation", "automated_content_generation"]
+    }
+  },
+  
+  "activation_rules": {
+    "file_pattern_matching": true,
+    "keyword_detection": true,
+    "context_analysis": true,
+    "user_preference_learning": true
+  },
+  
+  "quality_gates": {
+    "accessibility": ["WCAG 2.1 AA", "keyboard_navigation", "screen_reader"],
+    "performance": ["Core Web Vitals", "lighthouse_score_90", "mobile_first"],
+    "security": ["OWASP_top_10", "authentication", "data_protection"],
+    "code_quality": ["typescript_strict", "eslint_clean", "test_coverage_80"]
+  },
+  
+  "integration": {
+    "mcp_servers": ["Context7", "Sequential", "Magic", "Playwright"],
+    "tool_orchestration": true,
+    "parallel_execution": true,
+    "result_aggregation": true
+  },
+  
+  "project_context": {
+    "venue_type": "premium_speakeasy",
+    "location": "Leeds_UK", 
+    "target_audience": "upscale_nightlife_clientele",
+    "key_features": ["table_booking", "event_calendar", "cocktail_menu", "private_hire"]
+  }
+}

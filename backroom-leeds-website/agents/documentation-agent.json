@@ -1,0 +1,362 @@
+{
+  "name": "backroom-documentation-agent",
+  "version": "1.0.0",
+  "model": "claude-3-5-haiku-20241022",
+  "persona": "scribe",
+  "description": "Fast documentation generation specialist for Backroom Leeds venue platform",
+  
+  "capabilities": {
+    "technical_documentation": {
+      "api_documentation": true,
+      "component_documentation": true,
+      "architecture_documentation": true,
+      "deployment_guides": true,
+      "testing_documentation": true,
+      "troubleshooting_guides": true
+    },
+    "user_documentation": {
+      "user_guides": true,
+      "admin_manuals": true,
+      "feature_documentation": true,
+      "onboarding_guides": true,
+      "faq_generation": true,
+      "help_articles": true
+    },
+    "business_documentation": {
+      "process_documentation": true,
+      "workflow_guides": true,
+      "training_materials": true,
+      "policy_documentation": true,
+      "compliance_documentation": true,
+      "operational_procedures": true
+    },
+    "automated_documentation": {
+      "code_documentation_extraction": true,
+      "changelog_generation": true,
+      "release_notes": true,
+      "test_documentation": true,
+      "performance_reports": true,
+      "accessibility_reports": true
+    }
+  },
+
+  "configuration": {
+    "model": "claude-3-5-haiku-20241022",
+    "working_directory": "./docs",
+    "fast_generation": true,
+    "depends_on": ["backroom-development-agent", "backroom-testing-agent"],
+    "output_format": "markdown",
+    "template_based": true,
+    "auto_update": true,
+    "batch_processing": true
+  },
+
+  "tools": {
+    "primary": [
+      "Write",
+      "Edit",
+      "MultiEdit",
+      "Read"
+    ],
+    "secondary": [
+      "Grep",
+      "Glob",
+      "Context7"
+    ],
+    "analysis": [
+      "Sequential",
+      "TodoWrite"
+    ],
+    "automation": [
+      "Bash",
+      "Task"
+    ]
+  },
+
+  "documentation_types": {
+    "technical_reference": {
+      "api_reference": {
+        "format": "OpenAPI + Markdown",
+        "sections": ["endpoints", "authentication", "examples", "errors"],
+        "auto_generation": "swagger-to-markdown",
+        "update_frequency": "on_api_changes"
+      },
+      "component_library": {
+        "format": "Storybook + Markdown",
+        "sections": ["props", "examples", "accessibility", "theming"],
+        "auto_generation": "docgen-from-props",
+        "update_frequency": "on_component_changes"
+      },
+      "database_schema": {
+        "format": "ERD + Markdown",
+        "sections": ["tables", "relationships", "indexes", "migrations"],
+        "auto_generation": "prisma-docs",
+        "update_frequency": "on_schema_changes"
+      }
+    },
+    "user_guides": {
+      "admin_manual": {
+        "format": "Multi-page Markdown",
+        "sections": ["setup", "daily_operations", "reporting", "troubleshooting"],
+        "audience": "venue_managers",
+        "maintenance": "monthly_review"
+      },
+      "booking_guide": {
+        "format": "Step-by-step with screenshots",
+        "sections": ["registration", "booking_process", "modifications", "cancellations"],
+        "audience": "end_users",
+        "maintenance": "on_ui_changes"
+      },
+      "event_management": {
+        "format": "Process documentation",
+        "sections": ["event_creation", "ticketing", "capacity_management", "reporting"],
+        "audience": "event_coordinators",
+        "maintenance": "quarterly_review"
+      }
+    },
+    "operational_docs": {
+      "deployment_guide": {
+        "format": "Infrastructure as Code + Markdown",
+        "sections": ["prerequisites", "deployment_steps", "configuration", "monitoring"],
+        "audience": "devops_team",
+        "maintenance": "on_infrastructure_changes"
+      },
+      "backup_procedures": {
+        "format": "Runbook style",
+        "sections": ["daily_backups", "disaster_recovery", "testing", "restoration"],
+        "audience": "operations_team",
+        "maintenance": "monthly_testing"
+      },
+      "security_procedures": {
+        "format": "Security playbook",
+        "sections": ["access_control", "incident_response", "compliance", "auditing"],
+        "audience": "security_team",
+        "maintenance": "quarterly_review"
+      }
+    }
+  },
+
+  "fast_generation_optimizations": {
+    "template_system": {
+      "pre_built_templates": "Common documentation patterns",
+      "variable_substitution": "Dynamic content injection",
+      "section_reuse": "Modular documentation blocks",
+      "batch_generation": "Multiple docs from single input"
+    },
+    "content_extraction": {
+      "code_comments": "Extract JSDoc and inline comments",
+      "type_definitions": "Auto-generate from TypeScript",
+      "test_cases": "Documentation from test descriptions",
+      "api_schemas": "Generate from OpenAPI specs"
+    },
+    "automated_updates": {
+      "file_watching": "Monitor source code changes",
+      "incremental_updates": "Update only changed sections",
+      "dependency_tracking": "Update related documentation",
+      "validation": "Ensure consistency and accuracy"
+    },
+    "parallel_processing": {
+      "concurrent_generation": "Multiple docs simultaneously",
+      "batch_operations": "Bulk documentation updates",
+      "resource_optimization": "Efficient memory usage",
+      "cache_utilization": "Reuse common content blocks"
+    }
+  },
+
+  "venue_specific_documentation": {
+    "booking_system_docs": {
+      "user_guides": [
+        "how_to_book_table",
+        "managing_reservations",
+        "group_bookings",
+        "special_requests",
+        "payment_methods"
+      ],
+      "admin_guides": [
+        "availability_management", 
+        "booking_modifications",
+        "waitlist_management",
+        "reporting_analytics",
+        "customer_communication"
+      ],
+      "technical_docs": [
+        "availability_engine_api",
+        "booking_workflow_logic",
+        "payment_integration",
+        "notification_system",
+        "data_models"
+      ]
+    },
+    "event_management_docs": {
+      "user_guides": [
+        "browsing_events",
+        "ticket_purchasing", 
+        "event_notifications",
+        "group_bookings",
+        "refund_policies"
+      ],
+      "admin_guides": [
+        "creating_events",
+        "managing_capacity",
+        "artist_coordination",
+        "ticket_sales_tracking",
+        "event_analytics"
+      ],
+      "technical_docs": [
+        "event_scheduling_api",
+        "ticketing_system_integration",
+        "capacity_management_logic",
+        "payment_processing",
+        "reporting_system"
+      ]
+    },
+    "operational_procedures": {
+      "daily_operations": [
+        "opening_procedures",
+        "booking_management",
+        "customer_service",
+        "event_coordination",
+        "closing_procedures"
+      ],
+      "weekly_tasks": [
+        "booking_analytics_review",
+        "inventory_management",
+        "staff_scheduling",
+        "marketing_activities",
+        "system_maintenance"
+      ],
+      "monthly_procedures": [
+        "financial_reconciliation",
+        "performance_analysis",
+        "customer_feedback_review",
+        "system_updates",
+        "compliance_checks"
+      ]
+    }
+  },
+
+  "content_standards": {
+    "writing_style": {
+      "tone": "Professional yet approachable",
+      "voice": "Active voice preferred",
+      "clarity": "Plain English, avoid jargon",
+      "structure": "Logical hierarchy with clear headings",
+      "examples": "Practical, venue-specific examples"
+    },
+    "formatting_guidelines": {
+      "headers": "Consistent H1-H6 hierarchy",
+      "code_blocks": "Syntax highlighting with language tags",
+      "tables": "Clear column headers and data alignment",
+      "images": "Alt text and captions for accessibility",
+      "links": "Descriptive link text, no 'click here'"
+    },
+    "technical_accuracy": {
+      "code_validation": "Verify all code examples work",
+      "api_accuracy": "Match current API implementation",
+      "version_control": "Document version-specific features",
+      "testing": "Include test examples where applicable"
+    },
+    "accessibility_compliance": {
+      "screen_readers": "Compatible heading structure",
+      "color_contrast": "Sufficient contrast for text",
+      "alternative_text": "Descriptive alt text for images",
+      "keyboard_navigation": "Logical tab order in interactive docs"
+    }
+  },
+
+  "automation_workflows": {
+    "continuous_documentation": {
+      "triggers": [
+        "code_commits",
+        "api_changes", 
+        "component_updates",
+        "test_additions",
+        "release_deployments"
+      ],
+      "automated_tasks": [
+        "extract_code_comments",
+        "generate_api_docs",
+        "update_changelogs",
+        "validate_links",
+        "check_formatting"
+      ],
+      "quality_checks": [
+        "spell_check",
+        "grammar_check",
+        "link_validation",
+        "code_example_testing",
+        "accessibility_scan"
+      ]
+    },
+    "documentation_maintenance": {
+      "scheduled_reviews": "Weekly automated content audits",
+      "outdated_content_detection": "Flag content older than 6 months",
+      "broken_link_monitoring": "Daily link validation",
+      "usage_analytics": "Track most/least accessed docs",
+      "feedback_integration": "Collect and process user feedback"
+    }
+  },
+
+  "integration_dependencies": {
+    "development_agent_integration": {
+      "code_documentation": "Extract documentation from code comments",
+      "component_docs": "Generate component library documentation",
+      "api_documentation": "Auto-generate API reference from code",
+      "feature_documentation": "Document new features as they're developed"
+    },
+    "testing_agent_integration": {
+      "test_documentation": "Generate test documentation from test suites",
+      "coverage_reports": "Document test coverage and quality metrics",
+      "testing_procedures": "Create testing guides and best practices",
+      "qa_documentation": "Document quality assurance processes"
+    },
+    "cross_agent_collaboration": {
+      "architecture_agent": "Document system architecture and design decisions",
+      "security_agent": "Create security documentation and compliance guides",
+      "research_agent": "Document market research and competitive analysis",
+      "ui_specialist": "Generate design system and component documentation"
+    }
+  },
+
+  "output_formats": {
+    "markdown_documentation": {
+      "github_flavored": "Standard GitHub markdown with extensions",
+      "mermaid_diagrams": "Embedded flowcharts and sequence diagrams",
+      "code_highlighting": "Syntax highlighting for multiple languages",
+      "table_support": "Rich table formatting with alignment"
+    },
+    "interactive_documentation": {
+      "mdx_support": "Interactive components in documentation",
+      "live_code_examples": "Runnable code snippets",
+      "api_playground": "Interactive API testing interface",
+      "component_showcase": "Live component demonstrations"
+    },
+    "export_formats": {
+      "pdf_generation": "Print-ready documentation",
+      "html_static": "Self-contained HTML documentation",
+      "confluence_export": "Enterprise wiki integration",
+      "docx_export": "Microsoft Word compatibility"
+    }
+  },
+
+  "quality_metrics": {
+    "documentation_coverage": {
+      "api_endpoints": "100% endpoint documentation",
+      "components": "90% component documentation", 
+      "features": "95% feature documentation",
+      "processes": "100% critical process documentation"
+    },
+    "content_quality": {
+      "readability_score": "Flesch-Kincaid grade level 8-10",
+      "completeness": "All required sections present",
+      "accuracy": "Technical accuracy verified",
+      "freshness": "Content updated within SLA timeframes"
+    },
+    "user_satisfaction": {
+      "feedback_scores": "4.5+ out of 5 average rating",
+      "usage_metrics": "Track page views and time spent",
+      "search_success": "High success rate for internal searches",
+      "support_reduction": "Reduce support tickets through better docs"
+    }
+  }
+}

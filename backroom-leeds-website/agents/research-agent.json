@@ -1,0 +1,202 @@
+{
+  "name": "backroom-research-agent",
+  "version": "1.0.0",
+  "model": "claude-sonnet-4-20250514",
+  "persona": "analyzer",
+  "description": "Advanced research and analysis agent for Backroom Leeds venue intelligence",
+  
+  "capabilities": {
+    "market_research": {
+      "competitive_analysis": true,
+      "venue_benchmarking": true,
+      "industry_trends": true,
+      "customer_personas": true
+    },
+    "venue_intelligence": {
+      "location_analysis": true,
+      "demographic_research": true,
+      "event_optimization": true,
+      "pricing_strategies": true
+    },
+    "content_research": {
+      "prohibition_era_authenticity": true,
+      "historical_accuracy": true,
+      "cultural_references": true,
+      "brand_positioning": true
+    },
+    "technical_research": {
+      "framework_evaluation": true,
+      "performance_benchmarking": true,
+      "security_assessment": true,
+      "accessibility_standards": true
+    }
+  },
+
+  "configuration": {
+    "working_directory": "./research",
+    "context_window": 1000000,
+    "enable_beta_features": true,
+    "parallel_processing": true,
+    "deep_analysis_mode": true
+  },
+
+  "tools": {
+    "primary": [
+      "WebSearch",
+      "WebFetch", 
+      "Sequential",
+      "Context7"
+    ],
+    "secondary": [
+      "Read",
+      "Write", 
+      "Grep",
+      "Glob"
+    ],
+    "analysis": [
+      "TodoWrite",
+      "Task"
+    ]
+  },
+
+  "research_domains": {
+    "venue_operations": {
+      "booking_systems": ["OpenTable", "Resy", "custom_solutions"],
+      "payment_processing": ["Stripe", "Square", "PayPal"],
+      "pos_systems": ["Toast", "Square", "Lightspeed"],
+      "inventory_management": ["BevSpot", "Partender", "BinWise"]
+    },
+    "hospitality_trends": {
+      "speakeasy_concepts": ["prohibition_themes", "hidden_venues", "exclusive_experiences"],
+      "cocktail_culture": ["craft_cocktails", "classic_recipes", "modern_twists"],
+      "event_programming": ["live_jazz", "themed_nights", "private_events"],
+      "customer_experience": ["personalization", "loyalty_programs", "vip_services"]
+    },
+    "leeds_market": {
+      "competition": ["other_speakeasies", "premium_bars", "jazz_venues"],
+      "demographics": ["age_groups", "income_levels", "lifestyle_preferences"],
+      "location_factors": ["foot_traffic", "accessibility", "parking", "transport_links"],
+      "regulatory": ["licensing", "noise_restrictions", "capacity_limits"]
+    },
+    "digital_presence": {
+      "website_best_practices": ["ux_patterns", "booking_flows", "mobile_optimization"],
+      "social_media_strategy": ["instagram_aesthetics", "event_promotion", "influencer_partnerships"],
+      "seo_opportunities": ["local_search", "venue_keywords", "event_discovery"],
+      "online_reputation": ["review_management", "customer_feedback", "brand_monitoring"]
+    }
+  },
+
+  "analysis_frameworks": {
+    "swot_analysis": {
+      "strengths": ["unique_positioning", "venue_atmosphere", "location_advantages"],
+      "weaknesses": ["market_awareness", "competition", "operational_challenges"], 
+      "opportunities": ["market_gaps", "expansion_potential", "partnership_opportunities"],
+      "threats": ["economic_factors", "regulatory_changes", "competitive_pressure"]
+    },
+    "customer_journey_mapping": {
+      "awareness": ["discovery_channels", "first_impressions", "brand_perception"],
+      "consideration": ["research_behavior", "comparison_factors", "decision_drivers"],
+      "booking": ["reservation_process", "payment_experience", "confirmation_communication"],
+      "experience": ["arrival_process", "service_quality", "atmosphere_satisfaction"],
+      "loyalty": ["repeat_visits", "referral_behavior", "social_sharing"]
+    },
+    "competitive_benchmarking": {
+      "direct_competitors": ["similar_speakeasies", "premium_cocktail_bars"],
+      "indirect_competitors": ["restaurants", "hotels", "entertainment_venues"],
+      "benchmark_metrics": ["pricing", "capacity", "event_frequency", "online_presence"],
+      "differentiation_opportunities": ["unique_selling_points", "service_gaps", "market_positioning"]
+    }
+  },
+
+  "output_formats": {
+    "research_reports": {
+      "executive_summary": true,
+      "detailed_findings": true,
+      "actionable_recommendations": true,
+      "data_visualizations": true
+    },
+    "market_analysis": {
+      "trend_identification": true,
+      "opportunity_mapping": true,
+      "risk_assessment": true,
+      "strategic_implications": true
+    },
+    "competitive_intelligence": {
+      "competitor_profiles": true,
+      "feature_comparisons": true,
+      "pricing_analysis": true,
+      "positioning_maps": true
+    },
+    "technical_assessments": {
+      "technology_stack_evaluation": true,
+      "performance_benchmarks": true,
+      "security_recommendations": true,
+      "scalability_analysis": true
+    }
+  },
+
+  "quality_standards": {
+    "research_depth": {
+      "primary_sources": "minimum_3_per_topic",
+      "cross_validation": "multiple_source_confirmation",
+      "recency": "data_within_12_months",
+      "relevance": "industry_specific_focus"
+    },
+    "analysis_rigor": {
+      "methodology_documentation": true,
+      "assumption_validation": true,
+      "bias_recognition": true,
+      "confidence_scoring": true
+    },
+    "deliverable_quality": {
+      "executive_readiness": true,
+      "actionable_insights": true,
+      "implementation_guidance": true,
+      "measurable_outcomes": true
+    }
+  },
+
+  "automation_triggers": {
+    "keywords": [
+      "research",
+      "analysis", 
+      "market",
+      "competition",
+      "trends",
+      "benchmarking",
+      "intelligence",
+      "insights"
+    ],
+    "file_patterns": [
+      "research/**/*",
+      "docs/market-analysis/*",
+      "data/competitive-intelligence/*"
+    ],
+    "context_indicators": [
+      "market_research_request",
+      "competitive_analysis_needed",
+      "trend_investigation_required",
+      "strategic_planning_phase"
+    ]
+  },
+
+  "integration": {
+    "mcp_servers": {
+      "primary": "Sequential",
+      "secondary": ["Context7", "WebSearch", "WebFetch"],
+      "coordination": "intelligent_routing"
+    },
+    "agent_collaboration": {
+      "ui_specialist": "user_experience_research",
+      "api_specialist": "technology_benchmarking", 
+      "content_specialist": "brand_research",
+      "security_specialist": "compliance_research"
+    },
+    "data_sources": {
+      "industry_reports": ["IBISWorld", "Euromonitor", "Mintel"],
+      "local_data": ["Leeds_Council", "Visit_Leeds", "local_business_directories"],
+      "social_media": ["Instagram", "TikTok", "Facebook", "Google_Reviews"],
+      "technical": ["GitHub", "Stack_Overflow", "technical_blogs"]
+    }
+  }
+}

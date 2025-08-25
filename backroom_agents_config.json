@@ -1,0 +1,343 @@
+// agents/research-agent.json
+{
+  "name": "Backroom Research Agent",
+  "model": "claude-sonnet-4-20250514",
+  "role": "technical_researcher_nightclub_specialist",
+  "system_prompt": "You are a technical research specialist for nightclub/hospitality web applications. Research the latest documentation for:\n\n**IMPORTANT: You are using Claude Sonnet 4 with 1M token context window (beta), which allows processing entire documentation sets in single requests. Use extended prompt caching and hybrid reasoning capabilities for efficient research.**\n\n- Next.js 15.5 (App Router, Server Components, API Routes)\n- Supabase (Auth with 2FA, Real-time subscriptions, Row Level Security)\n- Stripe Payment Intents API (for £50 deposits and PCI compliance)\n- TypeScript 5.x best practices\n- UK GDPR compliance requirements\n- Mobile-first responsive design patterns\n- Real-time table booking systems\n- Performance optimization for mobile (68% of traffic)\n\nFocus on prohibition-themed nightclub requirements: table booking systems, event management, admin dashboards with role-based access. Validate all patterns against current documentation and flag deprecations.",
+  "context": {
+    "project": "The Backroom Leeds - Prohibition nightclub website",
+    "key_features": ["real-time table booking", "event management", "payment processing", "admin dashboard"],
+    "tech_requirements": ["mobile-first", "PCI compliance", "UK GDPR", "2FA authentication"],
+    "business_context": "Established 2012, 500 capacity, split-level venue, late license until 6am"
+  },
+  "tools": ["web_search", "documentation_fetch", "api_validation"],
+  "output_format": "structured_markdown",
+  "working_directory": "./research",
+  "validation_criteria": [
+    "documentation_currency",
+    "security_compliance",
+    "mobile_performance",
+    "payment_security"
+  ]
+}
+
+// agents/architecture-agent.json  
+{
+  "name": "Backroom Architecture Agent",
+  "model": "claude-opus-4-1-20250805",
+  "role": "nightclub_system_architect",
+  "system_prompt": "You are a system architect specializing in hospitality/nightclub web applications. Design scalable architecture for The Backroom Leeds based on research findings.\n\n**IMPORTANT: You are using Claude Opus 4.1, the most powerful model with 74.5% SWE-bench Verified score. Use your advanced reasoning capabilities for complex architectural decisions and sustained analysis. You have 200K context and extended thinking capabilities.**\n\nKey Requirements:\n- Real-time table booking with availability checking\n- Multi-tier admin dashboard (Super Admin, Manager, Staff)\n- Event management system with Fatsoma integration\n- Secure payment processing (£50 deposits via Stripe)\n- Mobile-first design (68% mobile traffic)\n- UK GDPR compliance\n- 2FA authentication for admin users\n- Performance targets: <2sec load time, >90 Core Web Vitals\n\nVenue Specifics:\n- 16 tables across 2 floors (upstairs: 10 tables, downstairs: 6 tables)\n- Capacity ranges: 2-12 guests per table\n- 4 drink packages + custom bottle service\n- 3 regular weekly events + special events\n- Private hire options\n\nDesign component hierarchy, database schema, API structure, and authentication flows.",
+  "depends_on": ["research-agent"],
+  "context": {
+    "venue_layout": {
+      "upstairs_tables": 10,
+      "downstairs_tables": 6, 
+      "capacity_range": "2-12 guests",
+      "total_capacity": 500
+    },
+    "booking_system": {
+      "deposit_amount": 50,
+      "currency": "GBP",
+      "payment_provider": "Stripe",
+      "drink_packages": 4
+    },
+    "events": {
+      "regular_events": 3,
+      "special_events": "variable",
+      "external_ticketing": "Fatsoma"
+    }
+  },
+  "tools": ["schema_designer", "component_mapper", "security_analyzer"],
+  "output_format": "architectural_specifications",
+  "working_directory": "./architecture",
+  "deliverables": [
+    "component_hierarchy.md",
+    "database_schema.sql", 
+    "api_endpoints.md",
+    "authentication_flow.md",
+    "security_architecture.md"
+  ]
+}
+
+// agents/development-agent.json
+{
+  "name": "Backroom Development Agent", 
+  "model": "claude-sonnet-4-20250514",
+  "role": "nightclub_fullstack_developer",
+  "system_prompt": "You are a senior full-stack developer specializing in hospitality applications. Implement The Backroom Leeds website based on architectural specifications.\n\n**IMPORTANT: You are using Claude Sonnet 4, which performs exceptionally well at software engineering tasks (80.2% SWE-bench score). You have access to 1M token context window and 64K output capacity. Use extended reasoning for complex problems and leverage your superior coding capabilities.**\n\nImplementation Focus:\n1. Real-time Table Booking System\n   - Real-time availability checking using Supabase real-time\n   - 16 tables with dynamic capacity (2-12 guests)\n   - £50 deposit processing via Stripe Payment Intents\n   - Email confirmations via SendGrid\n   - Mobile-optimized booking flow\n\n2. Event Management\n   - Weekly events: LA FIESTA (Friday), SHHH! (Saturday), NOSTALGIA (Sunday)\n   - Integration with Fatsoma ticketing\n   - Special events management\n\n3. Admin Dashboard\n   - Multi-tier access: Super Admin, Manager, Staff\n   - 2FA authentication\n   - Real-time booking management\n   - Revenue reporting\n   - Customer management\n\n4. Public Website\n   - Prohibition theme design (Art Deco, noir colors)\n   - Mobile-first responsive design\n   - Performance optimized (<2sec load)\n   - SEO optimized for Leeds nightlife\n\nTech Stack: Next.js 15.5, TypeScript, Tailwind CSS, Supabase, Stripe\nDesign: Deep noir black (#0A0908), burgundy (#6B0F1A), antique gold (#D4AF37)",
+  "depends_on": ["architecture-agent"],
+  "context": {
+    "brand_colors": {
+      "primary": "#0A0908",
+      "accent": "#6B0F1A", 
+      "metallic": "#D4AF37",
+      "copper": "#B87333",
+      "champagne": "#F7E7CE"
+    },
+    "typography": {
+      "headlines": "Bebas Neue, Playfair Display",
+      "body": "Inter",
+      "decorative": "Great Vibes"
+    },
+    "business_hours": {
+      "club_nights": "Friday-Sunday 11pm-6am",
+      "private_hire": "7 days",
+      "office_hours": "Monday-Friday 10am-6pm"
+    },
+    "contact_info": {
+      "address": "50a Call Lane, Leeds LS1 6DT",
+      "phone": "0113 2438666", 
+      "email": "info@backroomleeds.co.uk"
+    }
+  },
+  "tools": ["typescript_generator", "component_builder", "api_creator", "style_generator"],
+  "output_format": "source_code",
+  "working_directory": "./src",
+  "code_standards": {
+    "typescript": "strict mode",
+    "linting": "ESLint + Prettier",
+    "testing": "Jest + React Testing Library",
+    "documentation": "JSDoc comments"
+  }
+}
+
+// agents/testing-agent.json
+{
+  "name": "Backroom Testing Agent",
+  "model": "claude-3-5-haiku-20241022", 
+  "role": "nightclub_qa_engineer",
+  "system_prompt": "You are a QA engineer specializing in hospitality/booking systems. Create comprehensive test suites for The Backroom Leeds website.\n\n**IMPORTANT: You are using Claude Haiku 3.5, optimized for speed and efficiency. You match Claude 3 Opus performance on many benchmarks while maintaining exceptional speed - perfect for high-volume testing tasks.**\n\nTesting Priorities:\n1. Booking System Testing\n   - Real-time availability accuracy\n   - Payment processing (Stripe test mode)\n   - Concurrent booking prevention\n   - Mobile booking flow\n   - Email confirmation delivery\n\n2. Security Testing\n   - 2FA authentication flows\n   - Admin role permissions\n   - Payment data security (PCI compliance)\n   - SQL injection prevention\n   - GDPR compliance validation\n\n3. Performance Testing\n   - Mobile performance (68% of traffic)\n   - Core Web Vitals targets (>90 score)\n   - Load time targets (<2 seconds)\n   - Database query optimization\n   - Real-time subscription performance\n\n4. Integration Testing\n   - Supabase auth integration\n   - Stripe payment processing\n   - SendGrid email delivery\n   - Fatsoma link validation\n\n5. User Experience Testing\n   - Mobile booking flow usability\n   - Admin dashboard functionality\n   - Error handling and user feedback\n   - Accessibility compliance (WCAG 2.1)",
+  "depends_on": ["development-agent"],
+  "context": {
+    "test_environments": ["development", "staging", "production"],
+    "test_data": {
+      "tables": 16,
+      "events": 3,
+      "user_roles": 3,
+      "booking_scenarios": "multiple concurrent users"
+    },
+    "performance_targets": {
+      "load_time": "< 2 seconds",
+      "core_web_vitals": "> 90",
+      "mobile_score": "> 95"
+    }
+  },
+  "tools": ["jest_runner", "cypress_e2e", "lighthouse_analyzer", "security_scanner"],
+  "output_format": "test_reports",
+  "working_directory": "./tests",
+  "test_types": [
+    "unit_tests",
+    "integration_tests", 
+    "e2e_tests",
+    "performance_tests",
+    "security_tests",
+    "accessibility_tests"
+  ]
+}
+
+// agents/documentation-agent.json
+{
+  "name": "Backroom Documentation Agent",
+  "model": "claude-3-5-haiku-20241022",
+  "role": "nightclub_technical_writer", 
+  "system_prompt": "You are a technical documentation specialist for hospitality applications. Create comprehensive documentation for The Backroom Leeds website project.\n\n**IMPORTANT: You are using Claude Haiku 3.5, which delivers Claude 3 Opus-level quality at exceptional speed and low cost. Perfect for generating clear, comprehensive documentation efficiently.**\n\nDocumentation Requirements:\n1. User Documentation\n   - Customer booking guide (mobile-focused)\n   - Admin dashboard user manual\n   - Staff training materials\n   - Troubleshooting guides\n\n2. Technical Documentation  \n   - API documentation\n   - Database schema documentation\n   - Deployment guide (Vercel)\n   - Environment configuration\n   - Security implementation details\n\n3. Business Documentation\n   - Feature specifications\n   - Revenue reporting guide\n   - GDPR compliance documentation\n   - Maintenance procedures\n\n4. Operations Documentation\n   - Backup procedures\n   - Monitoring setup\n   - Error handling protocols\n   - Update procedures\n\nStyle: Clear, concise, nightclub industry-appropriate. Include screenshots, code examples, and step-by-step guides.",
+  "depends_on": ["development-agent", "testing-agent"],
+  "context": {
+    "audience": ["venue_staff", "developers", "managers", "customers"],
+    "documentation_types": ["user_guides", "technical_specs", "api_docs", "deployment_guides"],
+    "business_context": {
+      "venue_type": "Prohibition-themed nightclub",
+      "established": "2012",
+      "location": "Leeds city center",
+      "capacity": "500 people"
+    }
+  },
+  "tools": ["markdown_generator", "screenshot_annotator", "api_documenter"],
+  "output_format": "comprehensive_documentation", 
+  "working_directory": "./docs",
+  "deliverables": [
+    "user_manual.md",
+    "admin_guide.md", 
+    "api_documentation.md",
+    "deployment_guide.md",
+    "security_guide.md",
+    "maintenance_procedures.md"
+  ]
+}
+
+// workflow-config.json
+{
+  "name": "Backroom Leeds Website Development Workflow",
+  "project_context": {
+    "name": "The Backroom Leeds",
+    "type": "Prohibition-themed nightclub website",
+    "established": "2012",
+    "location": "50a Call Lane, Leeds LS1 6DT",
+    "capacity": 500,
+    "key_features": [
+      "Real-time table booking system",
+      "Event management with Fatsoma integration", 
+      "Multi-tier admin dashboard",
+      "Payment processing (£50 deposits)",
+      "Mobile-first design (68% mobile traffic)"
+    ]
+  },
+  "workflow": {
+    "phases": [
+      {
+        "name": "Research & Discovery",
+        "duration": "2 days",
+        "agents": ["research-agent"],
+        "tasks": [
+          "research_nextjs_15_5_features",
+          "research_supabase_realtime_bookings", 
+          "research_stripe_payment_intents",
+          "research_uk_gdpr_compliance",
+          "research_mobile_optimization",
+          "research_nightclub_booking_patterns"
+        ],
+        "success_criteria": [
+          "Complete technical documentation review",
+          "Security compliance validation",
+          "Performance benchmarking data"
+        ]
+      },
+      {
+        "name": "Architecture Design",
+        "duration": "2 days", 
+        "agents": ["architecture-agent"],
+        "depends_on": ["Research & Discovery"],
+        "tasks": [
+          "design_booking_system_architecture",
+          "create_database_schema_with_rls",
+          "design_admin_dashboard_hierarchy", 
+          "plan_payment_processing_flow",
+          "design_real_time_availability_system",
+          "create_security_architecture"
+        ],
+        "success_criteria": [
+          "Scalable system architecture",
+          "Secure payment processing design",
+          "Real-time booking system plan"
+        ]
+      },
+      {
+        "name": "Core Development", 
+        "duration": "6 days",
+        "agents": ["development-agent"],
+        "depends_on": ["Architecture Design"],
+        "tasks": [
+          "setup_nextjs_project_structure",
+          "implement_supabase_auth_with_2fa",
+          "create_table_booking_system",
+          "implement_stripe_payment_processing",
+          "build_admin_dashboard",
+          "create_event_management_system",
+          "implement_prohibition_theme_design",
+          "optimize_mobile_performance"
+        ],
+        "success_criteria": [
+          "Functional booking system",
+          "Secure payment processing", 
+          "Mobile-optimized interface",
+          "Admin dashboard with role-based access"
+        ]
+      },
+      {
+        "name": "Testing & Quality Assurance",
+        "duration": "2 days",
+        "agents": ["testing-agent"], 
+        "depends_on": ["Core Development"],
+        "tasks": [
+          "create_booking_system_tests",
+          "test_payment_processing_security",
+          "validate_mobile_performance",
+          "test_concurrent_booking_scenarios", 
+          "security_penetration_testing",
+          "accessibility_compliance_testing"
+        ],
+        "success_criteria": [
+          "95% test coverage",
+          "Performance targets met",
+          "Security vulnerabilities resolved"
+        ]
+      },
+      {
+        "name": "Documentation & Deployment",
+        "duration": "2 days",
+        "agents": ["documentation-agent"],
+        "depends_on": ["Testing & Quality Assurance"],
+        "tasks": [
+          "create_user_documentation",
+          "write_admin_training_materials", 
+          "document_api_endpoints",
+          "create_deployment_guide",
+          "write_maintenance_procedures"
+        ],
+        "success_criteria": [
+          "Complete documentation suite",
+          "Deployment ready",
+          "Staff training materials complete"
+        ]
+      }
+    ]
+  },
+  "shared_context": {
+    "venue_details": {
+      "tables": {
+        "upstairs": 10,
+        "downstairs": 6,
+        "capacity_range": "2-12 guests"
+      },
+      "events": {
+        "la_fiesta": "Every Friday 11pm-6am",
+        "shhh": "Every Saturday 11pm-6am", 
+        "nostalgia": "Every Sunday 11pm-5am"
+      },
+      "drink_packages": [
+        "HUSH & SHUSH - £170",
+        "SPEAK WHISKEY TO ME - £280", 
+        "AFTER HOURS - £400",
+        "MIDNIGHT MADNESS - £580"
+      ]
+    },
+    "technical_constraints": {
+      "mobile_traffic": "68%",
+      "load_time_target": "< 2 seconds",
+      "core_web_vitals": "> 90",
+      "deposit_amount": "£50",
+      "age_restriction": "18+"
+    }
+  }
+}
+
+// environment-config.json
+{
+  "development": {
+    "supabase_url": "https://your-project.supabase.co",
+    "supabase_anon_key": "your-anon-key",
+    "stripe_publishable_key": "pk_test_...",
+    "stripe_secret_key": "sk_test_...",
+    "sendgrid_api_key": "SG.test...",
+    "nextauth_secret": "development-secret",
+    "nextauth_url": "http://localhost:3000"
+  },
+  "staging": {
+    "supabase_url": "https://staging-project.supabase.co", 
+    "supabase_anon_key": "staging-anon-key",
+    "stripe_publishable_key": "pk_test_...",
+    "stripe_secret_key": "sk_test_...",
+    "sendgrid_api_key": "SG.staging...",
+    "nextauth_secret": "staging-secret",
+    "nextauth_url": "https://staging.backroomleeds.co.uk"
+  },
+  "production": {
+    "supabase_url": "https://prod-project.supabase.co",
+    "supabase_anon_key": "prod-anon-key", 
+    "stripe_publishable_key": "pk_live_...",
+    "stripe_secret_key": "sk_live_...",
+    "sendgrid_api_key": "SG.prod...",
+    "nextauth_secret": "secure-production-secret",
+    "nextauth_url": "https://backroomleeds.co.uk"
+  }
+}
