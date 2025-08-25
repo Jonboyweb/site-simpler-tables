@@ -1,0 +1,144 @@
+{
+  "name": "Backroom Leeds Website Development Workflow",
+  "project_context": {
+    "name": "The Backroom Leeds",
+    "type": "Prohibition-themed nightclub website",
+    "established": "2012",
+    "location": "50a Call Lane, Leeds LS1 6DT",
+    "capacity": 500,
+    "key_features": [
+      "Real-time table booking system",
+      "Event management with Fatsoma integration",
+      "Multi-tier admin dashboard",
+      "Payment processing (£50 deposits)",
+      "Mobile-first design (68% mobile traffic)"
+    ]
+  },
+  "workflow": {
+    "phases": [
+      {
+        "name": "Research & Discovery",
+        "duration": "2 days",
+        "agents": ["research-agent"],
+        "tasks": [
+          "research_nextjs_15_5_features",
+          "research_supabase_realtime_bookings",
+          "research_stripe_payment_intents",
+          "research_uk_gdpr_compliance",
+          "research_mobile_optimization",
+          "research_nightclub_booking_patterns"
+        ],
+        "success_criteria": [
+          "Complete technical documentation review",
+          "Security compliance validation",
+          "Performance benchmarking data"
+        ]
+      },
+      {
+        "name": "Architecture Design",
+        "duration": "2 days",
+        "agents": ["architecture-agent"],
+        "depends_on": ["Research & Discovery"],
+        "tasks": [
+          "design_booking_system_architecture",
+          "create_database_schema_with_rls",
+          "design_admin_dashboard_hierarchy",
+          "plan_payment_processing_flow",
+          "design_real_time_availability_system",
+          "create_security_architecture"
+        ],
+        "success_criteria": [
+          "Scalable system architecture",
+          "Secure payment processing design",
+          "Real-time booking system plan"
+        ]
+      },
+      {
+        "name": "Core Development",
+        "duration": "6 days",
+        "agents": ["development-agent"],
+        "depends_on": ["Architecture Design"],
+        "tasks": [
+          "setup_nextjs_project_structure",
+          "implement_supabase_auth_with_2fa",
+          "create_table_booking_system",
+          "implement_stripe_payment_processing",
+          "build_admin_dashboard",
+          "create_event_management_system",
+          "implement_prohibition_theme_design",
+          "optimize_mobile_performance"
+        ],
+        "success_criteria": [
+          "Functional booking system",
+          "Secure payment processing",
+          "Mobile-optimized interface",
+          "Admin dashboard with role-based access"
+        ]
+      },
+      {
+        "name": "Testing & Quality Assurance",
+        "duration": "2 days",
+        "agents": ["testing-agent"],
+        "depends_on": ["Core Development"],
+        "tasks": [
+          "create_booking_system_tests",
+          "test_payment_processing_security",
+          "validate_mobile_performance",
+          "test_concurrent_booking_scenarios",
+          "security_penetration_testing",
+          "accessibility_compliance_testing"
+        ],
+        "success_criteria": [
+          "95% test coverage",
+          "Performance targets met",
+          "Security vulnerabilities resolved"
+        ]
+      },
+      {
+        "name": "Documentation & Deployment",
+        "duration": "2 days",
+        "agents": ["documentation-agent"],
+        "depends_on": ["Testing & Quality Assurance"],
+        "tasks": [
+          "create_user_documentation",
+          "write_admin_training_materials",
+          "document_api_endpoints",
+          "create_deployment_guide",
+          "write_maintenance_procedures"
+        ],
+        "success_criteria": [
+          "Complete documentation suite",
+          "Deployment ready",
+          "Staff training materials complete"
+        ]
+      }
+    ]
+  },
+  "shared_context": {
+    "venue_details": {
+      "tables": {
+        "upstairs": 10,
+        "downstairs": 6,
+        "capacity_range": "2-12 guests"
+      },
+      "events": {
+        "la_fiesta": "Every Friday 11pm-6am",
+        "shhh": "Every Saturday 11pm-6am",
+        "nostalgia": "Every Sunday 11pm-5am"
+      },
+      "drink_packages": [
+        "HUSH & SHUSH - £170",
+        "SPEAK WHISKEY TO ME - £280",
+        "AFTER HOURS - £400",
+        "MIDNIGHT MADNESS - £580"
+      ]
+    },
+    "technical_constraints": {
+      "mobile_traffic": "68%",
+      "load_time_target": "< 2 seconds",
+      "core_web_vitals": "> 90",
+      "deposit_amount": "£50",
+      "age_restriction": "18+"
+    }
+  }
+}
