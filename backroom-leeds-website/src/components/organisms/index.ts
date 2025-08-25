@@ -2,5 +2,5 @@
 export { NavigationHeader } from './NavigationHeader';
 export { Footer } from './Footer';
 export { EventCard } from './EventCard';
-export { EventsGrid } from './EventsGrid';
+export { EventsList } from './EventsList';
 export { TableBookingForm } from './TableBookingForm';

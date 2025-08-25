@@ -75,6 +75,33 @@ export interface NavigationHeaderProps {
   hideOnScroll?: boolean;
 }
 
+// Event related types based on database schema
+export interface Event {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  dj_lineup: string[] | null;
+  music_genres: string[] | null;
+  image_url: string | null;
+  ticket_url: string | null;
+  is_active: boolean | null;
+  is_recurring: boolean | null;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+// Event instance type for specific dates
+export interface EventInstance {
+  id: string;
+  event: Event;
+  date: Date;
+  soldOut?: boolean;
+}
+
 export interface EventCardProps {
   id: string;
   title: string;
