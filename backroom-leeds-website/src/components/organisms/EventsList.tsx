@@ -39,7 +39,7 @@ export function EventsList({ events }: EventsListProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="luxury-events-grid">
       {events.map((eventInstance) => {
         const eventType = getEventType(eventInstance.event.name);
         const availableTables = getAvailableTables(eventInstance);

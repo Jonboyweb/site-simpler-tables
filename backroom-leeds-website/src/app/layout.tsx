@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, Bebas_Neue, Playfair_Display, Great_Vibes } from 'next/font/google'
+import { Inter, Bebas_Neue, Playfair_Display, Great_Vibes, Raleway, Crimson_Pro } from 'next/font/google'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
@@ -21,6 +21,18 @@ const greatVibes = Great_Vibes({
   display: 'swap'
 })
 
+// Luxury typography fonts
+const raleway = Raleway({ 
+  subsets: ['latin'], 
+  variable: '--font-raleway',
+  display: 'swap'
+})
+const crimsonPro = Crimson_Pro({ 
+  subsets: ['latin'], 
+  variable: '--font-crimson',
+  display: 'swap'
+})
+
 export const metadata: Metadata = {
   title: 'The Backroom Leeds | Premium Speakeasy Experience',
   description: 'Step into Leeds\' most exclusive speakeasy. Premium cocktails, live jazz, and prohibition-era elegance beneath the railway bridges.',
@@ -38,8 +50,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${bebas.variable} ${playfair.variable} ${greatVibes.variable}`}>
-      <body className={`${inter.className} min-h-screen antialiased`}>
+    <html lang="en" className={`${inter.variable} ${bebas.variable} ${playfair.variable} ${greatVibes.variable} ${raleway.variable} ${crimsonPro.variable}`}>
+      <body className={`luxury-underground min-h-screen antialiased`}>
         {children}
       </body>
     </html>

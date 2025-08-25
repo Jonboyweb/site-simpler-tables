@@ -41,9 +41,9 @@ async function EventsContainer() {
     if (events.length === 0) {
       return (
         <div className="text-center py-16">
-          <div className="w-16 h-16 mx-auto mb-4 bg-speakeasy-gold/20 rounded-full flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-luxury-copper/20 rounded-full flex items-center justify-center">
             <svg 
-              className="w-8 h-8 text-speakeasy-gold" 
+              className="w-8 h-8 text-luxury-copper" 
               fill="none" 
               viewBox="0 0 24 24" 
               stroke="currentColor"
@@ -57,10 +57,10 @@ async function EventsContainer() {
               />
             </svg>
           </div>
-          <p className="text-speakeasy-champagne/80 text-lg font-playfair">
+          <p className="text-luxury-champagne/80 text-lg font-crimson italic">
             No events currently scheduled
           </p>
-          <p className="text-speakeasy-champagne/60 text-sm mt-2">
+          <p className="text-luxury-smoke/80 text-sm mt-2 font-raleway">
             Check back soon for upcoming shows and exclusive speakeasy experiences!
           </p>
         </div>
@@ -84,19 +84,18 @@ async function EventsContainer() {
 export default function EventsPage() {
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-12">
+      <div className="luxury-events-section">
         {/* Page Header */}
-        <header className="text-center mb-12">
-          <h1 className="text-5xl md:text-6xl font-bebas text-speakeasy-gold mb-4 tracking-wider">
+        <header className="luxury-events-header">
+          <h1 className="luxury-events-title">
             Upcoming Events
           </h1>
-          <p className="text-lg text-speakeasy-champagne max-w-3xl mx-auto font-playfair leading-relaxed">
+          <p className="luxury-events-subtitle">
             Experience the finest entertainment at Leeds&apos; most exclusive speakeasy. 
-            From <span className="text-speakeasy-gold font-semibold">LA FIESTA&apos;s</span> vibrant Latin nights to{' '}
-            <span className="text-speakeasy-gold font-semibold">SHHH!&apos;s</span> intimate deep house sessions and{' '}
-            <span className="text-speakeasy-gold font-semibold">NOSTALGIA&apos;s</span> timeless classics.
+            From <span className="text-luxury-copper font-semibold">LA FIESTA&apos;s</span> vibrant Latin nights to{' '}
+            <span className="text-luxury-copper font-semibold">SHHH!&apos;s</span> intimate deep house sessions and{' '}
+            <span className="text-luxury-copper font-semibold">NOSTALGIA&apos;s</span> timeless classics.
           </p>
-          <div className="mt-6 h-px bg-gradient-to-r from-transparent via-speakeasy-gold/30 to-transparent max-w-md mx-auto"></div>
         </header>
         
         {/* Events Grid with Suspense */}
@@ -108,17 +107,16 @@ export default function EventsPage() {
         
         {/* Call to Action */}
         <section className="mt-16 text-center">
-          <div className="bg-gradient-to-r from-speakeasy-burgundy/20 to-speakeasy-noir/20 rounded-lg p-8 border border-speakeasy-gold/20">
-            <h2 className="text-2xl font-bebas text-speakeasy-gold mb-4 tracking-wide">
+          <div className="luxury-event-card p-8">
+            <h2 className="text-2xl font-futura text-luxury-copper mb-4 tracking-wide uppercase">
               Reserve Your Table
             </h2>
-            <p className="text-speakeasy-champagne/80 mb-6 font-playfair">
+            <p className="text-luxury-champagne/80 mb-6 font-crimson italic">
               Secure your spot at Leeds&apos; most exclusive speakeasy experience
             </p>
             <Link
               href="/book"
-              className="inline-block bg-speakeasy-gold text-speakeasy-noir px-8 py-3 rounded font-semibold 
-                       hover:bg-speakeasy-copper transition-colors duration-300 uppercase tracking-wider"
+              className="luxury-cta-primary px-8 py-3 rounded font-medium"
               aria-label="Book a table at The Backroom Leeds"
             >
               Book Now
