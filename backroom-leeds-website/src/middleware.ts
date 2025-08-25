@@ -1,12 +1,17 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createServerClient } from '@supabase/ssr'
-import type { Database } from '@/types/database.types'
+import { getToken } from 'next-auth/jwt';
 
-// Route protection middleware with Supabase authentication
+// Route protection middleware with NextAuth authentication
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
+  // Get JWT token from NextAuth
+  const token = await getToken({ 
+    req: request, 
+    secret: process.env.NEXTAUTH_SECRET 
+  });
+
   // Create a response object
   const response = NextResponse.next({
     request: {
@@ -14,54 +19,45 @@ export async function middleware(request: NextRequest) {
     },
   })
 
-  // Create Supabase client for middleware
-  const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          const cookieNames = request.cookies.getAll().map(c => c.name)
-          return cookieNames.map(name => ({
-            name,
-            value: request.cookies.get(name)?.value || ''
-          }))
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
-
-  // Get current user for authentication checks
-  const { data: { user } } = await supabase.auth.getUser()
-
   // Admin route protection
   if (pathname.startsWith('/admin')) {
     // Skip login page
     if (pathname === '/admin/login') {
       // If already authenticated, redirect to dashboard
-      if (user) {
+      if (token) {
         return NextResponse.redirect(new URL('/admin/dashboard', request.url))
       }
       return response;
     }
 
     // Check if user is authenticated and is an admin user
-    if (!user) {
+    if (!token) {
       const loginUrl = new URL('/admin/login', request.url);
       loginUrl.searchParams.set('from', pathname);
       return NextResponse.redirect(loginUrl);
     }
 
-    // In development mode, add helpful headers
+    // Check role-based access for specific paths
+    const userRole = token.role as string;
+    
+    // Super admin only routes
+    if (pathname.startsWith('/admin/staff') && userRole !== 'super_admin') {
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    }
+    
+    // Manager and Super admin only routes
+    if ((pathname.startsWith('/admin/finance') || pathname.startsWith('/admin/reports')) 
+        && !['super_admin', 'manager'].includes(userRole)) {
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    }
+
+    // Add user context headers
+    response.headers.set('x-auth-user', token.sub || '');
+    response.headers.set('x-auth-role', userRole);
+    
     if (process.env.NODE_ENV === 'development') {
       response.headers.set('x-development-mode', 'true');
-      response.headers.set('x-auth-user', user.id);
-      response.headers.set('x-auth-email', user.email || '');
+      response.headers.set('x-auth-email', token.email || '');
     }
 
     return response;
@@ -70,7 +66,7 @@ export async function middleware(request: NextRequest) {
   // API route protection
   if (pathname.startsWith('/api/admin')) {
     // Check if user is authenticated
-    if (!user) {
+    if (!token) {
       return new NextResponse(
         JSON.stringify({
           error: 'Authentication required',
@@ -87,12 +83,12 @@ export async function middleware(request: NextRequest) {
     }
 
     // Add user context headers for API routes
-    response.headers.set('x-auth-user', user.id);
-    response.headers.set('x-auth-email', user.email || '');
+    response.headers.set('x-auth-user', token.sub || '');
+    response.headers.set('x-auth-role', token.role as string);
     
     if (process.env.NODE_ENV === 'development') {
       response.headers.set('x-development-mode', 'true');
-      response.headers.set('x-admin-api', 'true');
+      response.headers.set('x-auth-email', token.email || '');
     }
 
     return response;

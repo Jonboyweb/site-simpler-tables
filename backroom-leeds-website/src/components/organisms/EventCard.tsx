@@ -1,11 +1,20 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/molecules';
 import { Button, Badge, Heading, Text, CalendarIcon, ClockIcon } from '@/components/atoms';
 import type { EventCardProps } from '@/types/components';
 
+interface EnhancedEventCardProps extends EventCardProps {
+  availableTables?: number;
+  showBookingCTA?: boolean;
+  eventType?: 'LA_FIESTA' | 'SHHH' | 'NOSTALGIA';
+}
+
 export const EventCard = ({
+  id,
   title,
   date,
   image,
@@ -13,7 +22,12 @@ export const EventCard = ({
   artists = [],
   ticketLink,
   soldOut = false,
-}: EventCardProps) => {
+  availableTables,
+  showBookingCTA = true,
+  eventType,
+}: EnhancedEventCardProps) => {
+  const [tablesRemaining, setTablesRemaining] = useState<number>(availableTables || 16);
+
   const formattedDate = new Intl.DateTimeFormat('en-GB', {
     weekday: 'long',
     day: 'numeric',
@@ -25,6 +39,24 @@ export const EventCard = ({
     hour: '2-digit',
     minute: '2-digit',
   }).format(date);
+
+  // Get event-specific pricing info
+  const getEventPricing = (type: string | undefined) => {
+    switch (type) {
+      case 'LA_FIESTA':
+        return { min: 170, max: 580, recommended: 'premium' };
+      case 'SHHH':
+        return { min: 320, max: 580, recommended: 'vip' };
+      case 'NOSTALGIA':
+        return { min: 170, max: 320, recommended: 'basic' };
+      default:
+        return { min: 170, max: 580, recommended: 'premium' };
+    }
+  };
+
+  const pricing = getEventPricing(eventType);
+  const isLowAvailability = tablesRemaining <= 5;
+  const isSoldOut = tablesRemaining === 0 || soldOut;
 
   return (
     <Card variant="elevated" hover padding="none" className="overflow-hidden group">
@@ -46,11 +78,26 @@ export const EventCard = ({
             </div>
           </div>
         )}
-        {soldOut && (
+        {isSoldOut && (
           <div className="absolute inset-0 bg-speakeasy-noir/80 flex items-center justify-center">
             <Badge variant="danger" size="md" className="text-2xl px-6 py-2">
               Sold Out
             </Badge>
+          </div>
+        )}
+        
+        {/* Availability Indicator */}
+        {!isSoldOut && showBookingCTA && (
+          <div className="absolute top-4 left-4">
+            {isLowAvailability ? (
+              <Badge variant="warning" size="sm" className="backdrop-blur-sm bg-speakeasy-copper/90">
+                Only {tablesRemaining} left
+              </Badge>
+            ) : (
+              <Badge variant="success" size="sm" className="backdrop-blur-sm bg-speakeasy-gold/90 text-speakeasy-noir">
+                {tablesRemaining} tables available
+              </Badge>
+            )}
           </div>
         )}
       </div>
@@ -62,10 +109,17 @@ export const EventCard = ({
           <Heading level={4} variant="bebas" className="flex-1">
             {title}
           </Heading>
-          {!soldOut && ticketLink && (
-            <Badge variant="success" size="sm">
-              Available
-            </Badge>
+          {!isSoldOut && (
+            <div className="flex flex-col gap-1 text-right">
+              <Badge variant="success" size="sm">
+                Available
+              </Badge>
+              {showBookingCTA && (
+                <Text variant="caption" className="text-speakeasy-gold">
+                  From £{pricing.min}
+                </Text>
+              )}
+            </div>
           )}
         </div>
 
@@ -104,24 +158,56 @@ export const EventCard = ({
           </div>
         )}
 
-        {/* Action Button */}
-        {ticketLink && (
-          <div className="pt-2">
-            {soldOut ? (
-              <Button variant="ghost" fullWidth disabled>
-                Sold Out
-              </Button>
-            ) : (
+        {/* Action Buttons */}
+        <div className="pt-2 space-y-3">
+          {/* Table Booking Button */}
+          {showBookingCTA && (
+            <div>
+              {isSoldOut ? (
+                <Button variant="ghost" fullWidth disabled>
+                  Tables Sold Out
+                </Button>
+              ) : (
+                <Link href={`/book/${id}`} className="block">
+                  <Button
+                    variant="gold"
+                    fullWidth
+                    className="group"
+                  >
+                    <span className="flex items-center justify-between w-full">
+                      <span>Book Table</span>
+                      <span className="text-sm font-normal text-speakeasy-noir/80">
+                        From £{pricing.min}
+                      </span>
+                    </span>
+                  </Button>
+                </Link>
+              )}
+              
+              {/* Quick info about booking */}
+              {!isSoldOut && (
+                <Text variant="caption" className="text-center mt-2 text-speakeasy-champagne/70 block">
+                  £50 deposit • {tablesRemaining} tables left
+                </Text>
+              )}
+            </div>
+          )}
+          
+          {/* Ticket Button (if available) */}
+          {ticketLink && (
+            <div className="border-t border-speakeasy-gold/20 pt-3">
               <Button
-                variant="gold"
+                variant="copper"
+                size="sm"
                 fullWidth
                 onClick={() => window.open(ticketLink, '_blank')}
+                className="text-sm"
               >
-                Get Tickets
+                Get Entry Tickets
               </Button>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </div>
     </Card>
   );

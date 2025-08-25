@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { AdminLayout } from '@/components/templates';
+import { SessionProvider } from '@/components/providers/SessionProvider';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard | The Backroom Leeds',
@@ -15,5 +16,9 @@ export default function AdminRootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <AdminLayout>{children}</AdminLayout>;
+  return (
+    <SessionProvider>
+      <AdminLayout>{children}</AdminLayout>
+    </SessionProvider>
+  );
 }

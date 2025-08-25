@@ -3,42 +3,68 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
 import { cn } from '@/lib/utils';
-import { Button, Heading, Text, MenuIcon, CloseIcon } from '@/components/atoms';
+import { Button, Heading, Text } from '@/components/atoms';
 import type { AdminLayoutProps } from '@/types/components';
 
-const adminNavigation = {
-  super_admin: [
-    { href: '/admin', label: 'Dashboard', icon: '📊' },
-    { href: '/admin/bookings', label: 'Bookings', icon: '📅' },
-    { href: '/admin/events', label: 'Events', icon: '🎉' },
-    { href: '/admin/customers', label: 'Customers', icon: '👥' },
-    { href: '/admin/staff', label: 'Staff', icon: '👤' },
-    { href: '/admin/reports', label: 'Reports', icon: '📈' },
-    { href: '/admin/settings', label: 'Settings', icon: '⚙️' },
-  ],
-  manager: [
-    { href: '/admin', label: 'Dashboard', icon: '📊' },
-    { href: '/admin/bookings', label: 'Bookings', icon: '📅' },
-    { href: '/admin/events', label: 'Events', icon: '🎉' },
-    { href: '/admin/customers', label: 'Customers', icon: '👥' },
-    { href: '/admin/reports', label: 'Reports', icon: '📈' },
-  ],
-  door_staff: [
-    { href: '/admin', label: 'Dashboard', icon: '📊' },
-    { href: '/admin/bookings', label: 'Bookings', icon: '📅' },
-    { href: '/admin/check-in', label: 'Check-In', icon: '✅' },
-  ],
+// Navigation items based on user permissions
+const getNavigationForRole = (role: string) => {
+  const baseNavigation = [
+    { href: '/admin/dashboard', label: 'Dashboard', icon: '📊' },
+  ];
+
+  switch (role) {
+    case 'super_admin':
+      return [
+        ...baseNavigation,
+        { href: '/admin/bookings', label: 'Bookings', icon: '📅' },
+        { href: '/admin/events', label: 'Events', icon: '🎉' },
+        { href: '/admin/customers', label: 'Customers', icon: '👥' },
+        { href: '/admin/staff', label: 'Staff', icon: '👤' },
+        { href: '/admin/finance', label: 'Finance', icon: '💰' },
+        { href: '/admin/reports', label: 'Reports', icon: '📈' },
+        { href: '/admin/settings', label: 'Settings', icon: '⚙️' },
+      ];
+    case 'manager':
+      return [
+        ...baseNavigation,
+        { href: '/admin/bookings', label: 'Bookings', icon: '📅' },
+        { href: '/admin/events', label: 'Events', icon: '🎉' },
+        { href: '/admin/customers', label: 'Customers', icon: '👥' },
+        { href: '/admin/finance', label: 'Finance', icon: '💰' },
+        { href: '/admin/reports', label: 'Reports', icon: '📈' },
+      ];
+    case 'door_staff':
+      return [
+        ...baseNavigation,
+        { href: '/admin/bookings', label: 'Bookings', icon: '📅', readonly: true },
+        { href: '/admin/check-in', label: 'Check-In', icon: '✅' },
+      ];
+    default:
+      return baseNavigation;
+  }
 };
 
 export const AdminLayout = ({
   children,
   sidebarOpen: initialSidebarOpen = true,
-  userRole = 'manager',
 }: AdminLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(initialSidebarOpen);
+  const [loggingOut, setLoggingOut] = useState(false);
   const pathname = usePathname();
-  const navigation = adminNavigation[userRole];
+  const { data: session, status } = useSession();
+
+  const userRole = session?.user?.role || 'door_staff';
+  const navigation = getNavigationForRole(userRole);
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    await signOut({ 
+      callbackUrl: '/admin/login',
+      redirect: true 
+    });
+  };
 
   return (
     <div className="min-h-screen bg-speakeasy-noir">
@@ -52,27 +78,42 @@ export const AdminLayout = ({
               aria-label="Toggle sidebar"
             >
               {sidebarOpen ? (
-                <CloseIcon size="md" className="text-speakeasy-gold" />
+                <span className="text-speakeasy-gold text-xl">✕</span>
               ) : (
-                <MenuIcon size="md" className="text-speakeasy-gold" />
+                <span className="text-speakeasy-gold text-xl">☰</span>
               )}
             </button>
-            <Link href="/admin" className="flex items-center gap-2">
-              <Heading level={4} variant="bebas">
+            <Link href="/admin/dashboard" className="flex items-center gap-2">
+              <Heading level={4} variant="bebas" className="text-speakeasy-gold">
                 Admin Dashboard
               </Heading>
-              <Text variant="caption" className="text-speakeasy-copper">
+              <Text variant="caption" className="text-speakeasy-copper hidden sm:block">
                 The Backroom Leeds
               </Text>
             </Link>
           </div>
           <div className="flex items-center gap-4">
-            <Text variant="caption" className="hidden sm:block">
-              Role: <span className="text-speakeasy-gold">{userRole.replace('_', ' ').toUpperCase()}</span>
-            </Text>
-            <Button variant="ghost" size="sm">
-              Logout
-            </Button>
+            {session?.user && (
+              <>
+                <div className="hidden sm:block text-right">
+                  <Text variant="caption" className="text-speakeasy-champagne">
+                    {session.user.email}
+                  </Text>
+                  <Text variant="caption" className="text-speakeasy-gold block">
+                    {userRole.replace('_', ' ').toUpperCase()}
+                  </Text>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  className="text-speakeasy-champagne hover:text-speakeasy-gold"
+                >
+                  {loggingOut ? 'Signing out...' : 'Logout'}
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </header>

@@ -4,7 +4,7 @@
 import { ButtonHTMLAttributes, InputHTMLAttributes, HTMLAttributes, ReactNode } from 'react';
 
 // Base variant types for theming
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'gold' | 'copper';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'gold' | 'copper' | 'outline';
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 // Atom component props
@@ -143,7 +143,6 @@ export interface MainLayoutProps {
 export interface AdminLayoutProps {
   children: ReactNode;
   sidebarOpen?: boolean;
-  userRole?: 'super_admin' | 'manager' | 'door_staff';
 }
 
 export interface BookingLayoutProps {
