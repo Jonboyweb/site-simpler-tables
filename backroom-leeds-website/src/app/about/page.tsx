@@ -68,7 +68,7 @@ export default function AboutPage() {
                   Beneath the Bridges
                 </Heading>
                 <Text className="text-speakeasy-champagne/90 leading-relaxed mb-4">
-                  Our unique location beneath Leeds' railway bridges creates an atmosphere unlike any other. 
+                  Our unique location beneath Leeds&apos; railway bridges creates an atmosphere unlike any other. 
                   The rhythmic rumble overhead becomes part of our soundtrack, 
                   adding an industrial elegance to our prohibition-themed sanctuary.
                 </Text>

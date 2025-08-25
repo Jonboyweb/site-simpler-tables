@@ -137,17 +137,18 @@ export function CancellationHandler({
       // Redirect to cancellation confirmation page
       router.push(`/book/cancelled/${result.cancellationRef}`);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Cancellation failed';
       console.error('Cancellation failed:', error);
       
       const cancellationResult: CancellationResult = {
         success: false,
         refundEligible: false,
-        error: error.message || 'Cancellation failed'
+        error: errorMessage
       };
 
       onCancellationComplete?.(cancellationResult);
-      toast.error(error.message || 'Cancellation failed. Please try again.');
+      toast.error(errorMessage || 'Cancellation failed. Please try again.');
     } finally {
       setIsProcessing(false);
     }

@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
         },
       }
     );
-  } catch (error) {
+  } catch {
     return new Response(
       JSON.stringify({
         error: 'Invalid JSON payload',

@@ -10,7 +10,7 @@ import { DRINKS_PACKAGES, ARRIVAL_TIMES } from '@/types/booking';
 
 interface PaymentStepProps {
   eventDate: string;
-  onSubmit?: (data: any) => void;
+  onSubmit?: (data: Record<string, unknown>) => void;
   isSubmitting?: boolean;
   className?: string;
 }
@@ -41,11 +41,10 @@ export function PaymentStep({
 
   const termsAccepted = watch('termsAccepted');
   const privacyAccepted = watch('privacyPolicyAccepted');
-  const marketingConsent = watch('marketingConsent');
 
   const canSubmit = termsAccepted && privacyAccepted && !isSubmitting;
 
-  const handleFormSubmit = (data: any) => {
+  const handleFormSubmit = (data: Record<string, unknown>) => {
     if (canSubmit) {
       onSubmit?.(data);
     }

@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn, getSession } from 'next-auth/react';
-import type { Metadata } from 'next';
 import { Heading, Text, Button, LoadingSpinner } from '@/components/atoms';
 
 interface LoginError {
@@ -72,7 +71,7 @@ export default function AdminLoginPage() {
           router.refresh();
         }
       }
-    } catch (err) {
+    } catch {
       setError({ 
         message: 'An unexpected error occurred. Please try again.', 
         type: 'general' 

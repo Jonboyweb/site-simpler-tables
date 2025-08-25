@@ -53,7 +53,7 @@ export const AdminLayout = ({
   const [sidebarOpen, setSidebarOpen] = useState(initialSidebarOpen);
   const [loggingOut, setLoggingOut] = useState(false);
   const pathname = usePathname();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   const userRole = session?.user?.role || 'door_staff';
   const navigation = getNavigationForRole(userRole);

@@ -18,9 +18,6 @@ import {
   paymentSchema,
   FORM_STEPS,
   type BookingFormData,
-  type CustomerDetailsData,
-  type TableSelectionData,
-  type PaymentData,
   type CreateBookingRequest,
   type BookingResponse
 } from '@/types/booking';
@@ -101,12 +98,8 @@ export function BookingForm({
     reset(formData);
   }, [currentStep, formData, reset]);
 
-  const validateCurrentStep = async () => {
-    const result = await trigger();
-    return result;
-  };
 
-  const onStepSubmit = async (stepData: any) => {
+  const onStepSubmit = async (stepData: Record<string, unknown>) => {
     const updatedFormData = { ...formData, ...stepData };
     setFormData(updatedFormData);
 
@@ -179,10 +172,11 @@ export function BookingForm({
 
       toast.success('Booking created successfully! Redirecting to payment...');
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Booking failed. Please try again.';
       console.error('Booking submission failed:', error);
-      toast.error(error.message || 'Booking failed. Please try again.');
-      announceToScreenReader(`Error: ${error.message || 'Booking failed'}`);
+      toast.error(errorMessage);
+      announceToScreenReader(`Error: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
     }

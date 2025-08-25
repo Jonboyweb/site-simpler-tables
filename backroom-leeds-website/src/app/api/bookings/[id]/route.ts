@@ -118,7 +118,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     }
 
     // Prepare update data
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       updated_at: new Date().toISOString()
     };
 

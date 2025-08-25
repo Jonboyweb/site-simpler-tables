@@ -233,11 +233,12 @@ export async function POST(request: NextRequest) {
       }
     );
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Payment API error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     
     // Handle environment validation errors
-    if (error.message?.includes('Environment validation failed')) {
+    if (errorMessage?.includes('Environment validation failed')) {
       return NextResponse.json(
         {
           error: 'Configuration error',
@@ -325,7 +326,7 @@ export async function GET(request: NextRequest) {
       bookingRef: booking?.booking_ref
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Payment status retrieval error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

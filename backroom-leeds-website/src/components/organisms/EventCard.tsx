@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card } from '@/components/molecules';
 import { Button, Badge, Heading, Text, CalendarIcon, ClockIcon } from '@/components/atoms';
 import type { EventCardProps } from '@/types/components';
@@ -26,7 +26,7 @@ export const EventCard = ({
   showBookingCTA = true,
   eventType,
 }: EnhancedEventCardProps) => {
-  const [tablesRemaining, setTablesRemaining] = useState<number>(availableTables || 16);
+  const [tablesRemaining] = useState<number>(availableTables || 16);
 
   const formattedDate = new Intl.DateTimeFormat('en-GB', {
     weekday: 'long',

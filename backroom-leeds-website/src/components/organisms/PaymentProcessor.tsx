@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { loadStripe, Stripe, StripeElements } from '@stripe/stripe-js';
+import { loadStripe, Stripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -18,7 +18,7 @@ export interface PaymentProcessorProps {
   bookingRef: string;
   amount: number; // Amount in pence
   customerEmail: string;
-  onSuccess?: (paymentIntent: any) => void;
+  onSuccess?: (paymentIntent: unknown) => void;
   onError?: (error: string) => void;
   className?: string;
 }
@@ -125,9 +125,9 @@ function PaymentForm({
         router.push(`/book/confirmation/${bookingRef}`);
       }
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Payment processing error:', err);
-      const errorMessage = err.message || 'An unexpected error occurred';
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(errorMessage);
       onError?.(errorMessage);
       toast.error(errorMessage);
@@ -136,7 +136,7 @@ function PaymentForm({
     }
   };
 
-  const handleCardChange = (event: any) => {
+  const handleCardChange = (event: { complete: boolean; error?: { message: string } }) => {
     setCardComplete(event.complete);
     
     if (event.error) {
@@ -246,7 +246,7 @@ function PaymentForm({
 // Main PaymentProcessor component with Elements provider
 export function PaymentProcessor(props: PaymentProcessorProps) {
   const [stripe, setStripe] = useState<Stripe | null>(null);
-  const [elementsOptions, setElementsOptions] = useState<any>(null);
+  const [elementsOptions, setElementsOptions] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
     const initializeStripe = async () => {

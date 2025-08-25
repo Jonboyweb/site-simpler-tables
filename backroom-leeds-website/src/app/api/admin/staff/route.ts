@@ -14,13 +14,6 @@ const createStaffSchema = z.object({
   enable2FA: z.boolean().optional().default(false),
 });
 
-const updateStaffSchema = z.object({
-  role: z.enum(['super_admin', 'manager', 'door_staff']).optional(),
-  is_active: z.boolean().optional(),
-  enable2FA: z.boolean().optional(),
-  resetPassword: z.boolean().optional(),
-  newPassword: z.string().min(8).optional(),
-});
 
 interface CreateStaffRequest {
   email: string;
@@ -29,13 +22,6 @@ interface CreateStaffRequest {
   enable2FA?: boolean;
 }
 
-interface UpdateStaffRequest {
-  role?: 'super_admin' | 'manager' | 'door_staff';
-  is_active?: boolean;
-  enable2FA?: boolean;
-  resetPassword?: boolean;
-  newPassword?: string;
-}
 
 /**
  * GET /api/admin/staff

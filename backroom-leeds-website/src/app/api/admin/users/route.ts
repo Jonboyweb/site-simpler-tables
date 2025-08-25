@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 // Admin user management (Super Admin only)
 // This will be implemented in Phase 3 with authentication middleware
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   // Sample admin users data structure
   const sampleUsers = [
     {
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
         },
       }
     );
-  } catch (error) {
+  } catch {
     return new Response(
       JSON.stringify({
         error: 'Invalid JSON payload',

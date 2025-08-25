@@ -303,7 +303,7 @@ export default function AdminUsersPage() {
                 Door Staff
               </Heading>
               <ul className="text-speakeasy-champagne/80 text-sm space-y-1">
-                <li>• View tonight's bookings</li>
+                <li>• View tonight&apos;s bookings</li>
                 <li>• QR code scanner</li>
                 <li>• Manual check-in</li>
                 <li>• Real-time arrival tracking</li>

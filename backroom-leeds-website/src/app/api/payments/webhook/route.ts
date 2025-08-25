@@ -7,6 +7,34 @@ import { verifyWebhookSignature } from '@/lib/payments/stripe';
 import { requireValidEnvironment } from '@/lib/utils/environment';
 import type { Database } from '@/types/database.types';
 
+// Stripe webhook types
+interface StripeEvent {
+  id: string;
+  type: string;
+  data: {
+    object: StripePaymentIntent | StripeCharge | Record<string, unknown>;
+  };
+}
+
+interface StripePaymentIntent {
+  id: string;
+  amount: number;
+  metadata: {
+    booking_id?: string;
+    [key: string]: string | undefined;
+  };
+  last_payment_error?: {
+    message?: string;
+  };
+}
+
+interface StripeCharge {
+  id: string;
+  payment_intent?: string;
+}
+
+type SupabaseClient = ReturnType<typeof createRouteHandlerClient<Database>>;
+
 // Webhook event tracking for deduplication
 const processedEvents = new Map<string, { timestamp: number; status: string }>();
 const EVENT_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
@@ -31,10 +59,12 @@ function markEventProcessed(eventId: string): void {
   });
 }
 
-function logWebhookError(eventId: string, error: any, context: string): void {
+function logWebhookError(eventId: string, error: unknown, context: string): void {
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  const errorStack = error instanceof Error ? error.stack : undefined;
   console.error(`Webhook error [${eventId}] in ${context}:`, {
-    error: error.message || error,
-    stack: error.stack,
+    error: errorMessage,
+    stack: errorStack,
     timestamp: new Date().toISOString(),
     context
   });
@@ -113,20 +143,21 @@ export async function POST(request: NextRequest) {
       processingTime: Date.now() - startTime
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     const processingDuration = Date.now() - startTime;
+    const errorMessage = error instanceof Error ? error.message : String(error);
     
     logWebhookError(eventId, error, 'main_handler');
     
     // Handle different error types with appropriate responses
-    if (error.message?.includes('Environment validation failed')) {
+    if (errorMessage?.includes('Environment validation failed')) {
       return NextResponse.json(
         { error: 'Service configuration error' },
         { status: 503 }
       );
     }
     
-    if (error.message?.includes('timeout')) {
+    if (errorMessage?.includes('timeout')) {
       // For timeout errors, don't mark as processed to allow retry
       console.error(`Webhook [${eventId}] timed out after ${processingDuration}ms`);
       return NextResponse.json(
@@ -147,7 +178,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function handleWebhookEvent(event: any) {
+async function handleWebhookEvent(event: StripeEvent) {
   const supabase = createRouteHandlerClient<Database>({ cookies });
   const eventId = event.id;
   const eventType = event.type;
@@ -189,22 +220,24 @@ async function handleWebhookEvent(event: any) {
     // Log successful processing
     await createWebhookEventLog(supabase, eventId, eventType, 'processed', event.data.object, null);
     
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
     logWebhookError(eventId, error, `event_handler_${eventType}`);
     
     // Log failed processing
     await createWebhookEventLog(supabase, eventId, eventType, 'failed', event.data.object, {
-      error: error.message,
-      stack: error.stack
+      error: errorMessage,
+      stack: errorStack
     });
     
     throw error; // Re-throw to trigger retry at main handler level
   }
 }
 
-async function handlePaymentSucceeded(paymentIntent: any, supabase: any, eventId: string) {
+async function handlePaymentSucceeded(paymentIntent: StripePaymentIntent, supabase: SupabaseClient, eventId: string) {
   const bookingId = paymentIntent.metadata.booking_id;
-  const paymentIntentId = paymentIntent.id;
 
   if (!bookingId) {
     throw new Error(`No booking ID in payment intent metadata for event ${eventId}`);
@@ -293,7 +326,7 @@ async function handlePaymentSucceeded(paymentIntent: any, supabase: any, eventId
   }
 }
 
-async function handlePaymentFailed(paymentIntent: any, supabase: any, eventId: string) {
+async function handlePaymentFailed(paymentIntent: StripePaymentIntent, supabase: SupabaseClient, eventId: string) {
   const bookingId = paymentIntent.metadata.booking_id;
 
   if (!bookingId) {
@@ -366,7 +399,7 @@ async function handlePaymentFailed(paymentIntent: any, supabase: any, eventId: s
   }
 }
 
-async function handlePaymentRequiresAction(paymentIntent: any, supabase: any, eventId: string) {
+async function handlePaymentRequiresAction(paymentIntent: StripePaymentIntent, supabase: SupabaseClient, eventId: string) {
   const bookingId = paymentIntent.metadata.booking_id;
 
   if (!bookingId) {
@@ -403,7 +436,7 @@ async function handlePaymentRequiresAction(paymentIntent: any, supabase: any, ev
   }
 }
 
-async function handlePaymentProcessing(paymentIntent: any, supabase: any, eventId: string) {
+async function handlePaymentProcessing(paymentIntent: StripePaymentIntent, supabase: SupabaseClient, eventId: string) {
   const bookingId = paymentIntent.metadata.booking_id;
 
   if (!bookingId) {
@@ -430,7 +463,7 @@ async function handlePaymentProcessing(paymentIntent: any, supabase: any, eventI
   }
 }
 
-async function handleChargeDispute(charge: any, supabase: any, eventId: string) {
+async function handleChargeDispute(charge: StripeCharge, supabase: SupabaseClient, eventId: string) {
   console.log(`Charge dispute created for charge ${charge.id} [${eventId}]`);
 
   try {
@@ -464,12 +497,12 @@ async function handleChargeDispute(charge: any, supabase: any, eventId: string) 
 
 // Helper functions
 async function createEmailNotification(
-  supabase: any,
+  supabase: SupabaseClient,
   bookingId: string,
   type: string,
   recipientEmail: string,
   subject: string,
-  templateData: any
+  templateData: Record<string, unknown>
 ) {
   try {
     await supabase
@@ -488,12 +521,12 @@ async function createEmailNotification(
 }
 
 async function createAuditLog(
-  supabase: any,
+  supabase: SupabaseClient,
   tableName: string,
   action: string,
   recordId: string,
-  oldValues: any,
-  newValues: any
+  oldValues: Record<string, unknown>,
+  newValues: Record<string, unknown>
 ) {
   try {
     await supabase
@@ -514,7 +547,7 @@ async function flagForManualReview(
   bookingId: string,
   reason: string,
   paymentIntentId: string,
-  supabase: any,
+  supabase: SupabaseClient,
   priority: string = 'normal'
 ) {
   try {
@@ -540,7 +573,7 @@ async function flagForManualReview(
 }
 
 // New payment canceled handler
-async function handlePaymentCanceled(paymentIntent: any, supabase: any, eventId: string) {
+async function handlePaymentCanceled(paymentIntent: StripePaymentIntent, supabase: SupabaseClient, eventId: string) {
   const bookingId = paymentIntent.metadata.booking_id;
 
   if (!bookingId) {
@@ -581,7 +614,7 @@ async function handlePaymentCanceled(paymentIntent: any, supabase: any, eventId:
 
     console.log(`Booking ${bookingId} cancelled after payment cancellation [${eventId}]`);
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     logWebhookError(eventId, error, 'payment_canceled');
     throw error;
   }
@@ -589,12 +622,12 @@ async function handlePaymentCanceled(paymentIntent: any, supabase: any, eventId:
 
 // Webhook event logging for monitoring and debugging
 async function createWebhookEventLog(
-  supabase: any,
+  supabase: SupabaseClient,
   eventId: string,
   eventType: string,
   status: 'processed' | 'failed' | 'unhandled',
-  eventData: any,
-  errorDetails?: any
+  eventData: Record<string, unknown>,
+  errorDetails?: Record<string, unknown>
 ) {
   try {
     // Create a webhook event log entry

@@ -39,7 +39,7 @@ export interface PaymentResult {
 }
 
 // Enhanced error handling for different Stripe error types
-export function handleStripeError(error: any): PaymentResult {
+export function handleStripeError(error: unknown): PaymentResult {
   console.error('Stripe error:', error);
 
   if (error instanceof Stripe.errors.StripeError) {
@@ -247,7 +247,7 @@ export async function createRefund(
         amount: refund.amount,
         status: refund.status,
         created: refund.created
-      } as any
+      } as Record<string, unknown>
     };
 
   } catch (error) {

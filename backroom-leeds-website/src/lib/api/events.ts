@@ -225,7 +225,7 @@ function getMockVenueEvents(): EventInstance[] {
  * Get a single event by slug
  * TODO: Replace with actual Supabase client once server components are properly configured
  */
-export async function getEventBySlug(slug: string): Promise<Event | null> {
+export async function getEventBySlug(_slug: string): Promise<Event | null> {
   // const supabase = await createClient();
   // 
   // const { data: event, error } = await supabase

@@ -128,7 +128,7 @@ export function validateSupabaseConfig(): { valid: boolean; errors: string[]; wa
         if (!url.hostname.includes('supabase') && !url.hostname.includes('localhost') && !url.hostname.includes('127.0.0.1')) {
           warnings.push(`Supabase URL format may be incorrect: ${url.hostname}`);
         }
-      } catch (error) {
+      } catch {
         errors.push(`Invalid URL format for ${varName}`);
       }
     }
@@ -164,7 +164,7 @@ export function validateAppConfig(): { valid: boolean; errors: string[]; warning
     if (varName === 'NEXT_PUBLIC_APP_URL') {
       try {
         new URL(value);
-      } catch (error) {
+      } catch {
         errors.push(`Invalid URL format for ${varName}`);
       }
     }

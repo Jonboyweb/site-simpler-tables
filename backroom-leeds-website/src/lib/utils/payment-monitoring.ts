@@ -34,7 +34,7 @@ export interface PaymentLogData {
   eventId?: string;
   errorCode?: string;
   errorMessage?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   ipAddress?: string;
   userAgent?: string;
 }
@@ -159,7 +159,7 @@ export async function logPaymentPerformance(
   operation: string,
   duration: number,
   success: boolean,
-  additionalData?: Record<string, any>
+  additionalData?: Record<string, unknown>
 ) {
   const performanceData = {
     operation,
@@ -317,7 +317,7 @@ export async function trackSecurityEvent(
     userAgent?: string;
     endpoint?: string;
     reason?: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
   }
 ) {
   await logPaymentEvent(

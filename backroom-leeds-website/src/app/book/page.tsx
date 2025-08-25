@@ -24,7 +24,7 @@ export default function BookPage() {
               Reserve Your Table
             </h1>
             <p className="text-lg text-speakeasy-champagne max-w-2xl mx-auto font-playfair mb-8">
-              Secure your spot at Leeds' most exclusive speakeasy. Choose from our selection of premium tables 
+              Secure your spot at Leeds&apos; most exclusive speakeasy. Choose from our selection of premium tables 
               across two atmospheric floors, each with curated drinks packages.
             </p>
             

@@ -56,7 +56,7 @@ export const AccessibleFormField = forwardRef<
     }
 
     const inputProps = {
-      ref: ref as any,
+      ref: ref as React.Ref<HTMLInputElement>,
       id: fieldId,
       placeholder,
       'aria-describedby': describedBy || undefined,

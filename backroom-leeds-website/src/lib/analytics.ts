@@ -16,7 +16,7 @@ export const initAnalytics = () => {
   return null;
 };
 
-export const trackBookingEvent = (eventName: string, params?: Record<string, any>) => {
+export const trackBookingEvent = (eventName: string, params?: Record<string, unknown>) => {
   const analytics = initAnalytics();
   if (analytics) {
     logEvent(analytics, eventName, params);

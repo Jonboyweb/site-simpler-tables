@@ -12,7 +12,7 @@ const updateBookingSchema = z.object({
   party_size: z.number().min(1).max(20).optional(),
   arrival_time: z.string().optional(),
   table_ids: z.array(z.number().min(1).max(16)).optional(),
-  special_requests: z.any().optional(),
+  special_requests: z.record(z.unknown()).optional(),
   package_amount: z.number().min(0).optional(),
 });
 
@@ -141,7 +141,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     }
 
     // Prepare update object
-    const dbUpdate: any = { ...updateData };
+    const dbUpdate: Record<string, unknown> = { ...updateData };
 
     // Handle status changes with special logic
     if (updateData.status && updateData.status !== currentBooking.status) {

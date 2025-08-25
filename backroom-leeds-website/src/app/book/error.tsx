@@ -38,7 +38,7 @@ export default function BookingError({ error, reset }: BookingErrorProps) {
               Booking System Unavailable
             </Heading>
             <Text className="text-speakeasy-champagne/80 mb-6">
-              We're experiencing technical difficulties with our booking system. 
+              We&apos;re experiencing technical difficulties with our booking system. 
               Please try again or contact us directly to make your reservation.
             </Text>
           </div>

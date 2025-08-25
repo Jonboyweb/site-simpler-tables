@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { Heading, Text, LoadingSpinner, Button } from '@/components/atoms';
 import { Card } from '@/components/molecules';
 import { createClient } from '@/lib/supabase/client';
-import type { Database } from '@/types/database.types';
 
 interface DashboardStats {
   total_bookings_today: number;
@@ -49,7 +48,7 @@ export default function AdminDashboardPage() {
 
   const supabase = createClient();
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       setError(null);
 
@@ -132,7 +131,7 @@ export default function AdminDashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -160,7 +159,7 @@ export default function AdminDashboardPage() {
       bookingsSubscription.unsubscribe();
       clearInterval(refreshInterval);
     };
-  }, []);
+  }, [fetchDashboardData, supabase]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -250,7 +249,7 @@ export default function AdminDashboardPage() {
       {/* Key Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-6 bg-speakeasy-burgundy/20 border-speakeasy-gold/20">
-          <Text className="text-sm text-speakeasy-copper mb-2">Today's Bookings</Text>
+          <Text className="text-sm text-speakeasy-copper mb-2">Today&apos;s Bookings</Text>
           <Text className="text-3xl font-bebas text-speakeasy-champagne">
             {stats?.total_bookings_today || 0}
           </Text>

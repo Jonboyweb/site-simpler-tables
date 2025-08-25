@@ -191,7 +191,7 @@ export class PermissionManager {
     const cached = this.permissionCache.get(cacheKey);
     
     if (cached && cached.expiry > Date.now()) {
-      return cached.permissions as any; // Type hack for cache
+      return cached.permissions as StaffUser; // Type hack for cache
     }
 
     const supabase = createClient();
@@ -208,7 +208,7 @@ export class PermissionManager {
 
     // Cache the result
     this.permissionCache.set(cacheKey, {
-      permissions: staff as any, // Type hack for cache
+      permissions: staff as unknown as Permission[], // Type hack for cache
       expiry: Date.now() + this.CACHE_TTL,
     });
 

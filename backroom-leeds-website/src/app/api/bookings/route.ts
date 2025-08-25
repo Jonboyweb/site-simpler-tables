@@ -31,7 +31,7 @@ function generateBookingRef(): string {
 
 // Validate table availability
 async function validateTableAvailability(
-  supabase: any,
+  supabase: ReturnType<typeof createRouteHandlerClient<Database>>,
   eventDate: string,
   tableIds: number[]
 ): Promise<{ valid: boolean; message?: string }> {
@@ -73,8 +73,8 @@ async function validateTableAvailability(
     }
 
     // Check for conflicts
-    const bookedTableIds = new Set();
-    existingBookings?.forEach((booking: any) => {
+    const bookedTableIds = new Set<number>();
+    existingBookings?.forEach((booking) => {
       booking.table_ids?.forEach((id: number) => bookedTableIds.add(id));
     });
 

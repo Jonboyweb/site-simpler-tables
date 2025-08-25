@@ -177,7 +177,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     }
 
     // Prepare update object
-    const dbUpdate: any = {};
+    const dbUpdate: Record<string, unknown> = {};
     
     if (updateData.role && updateData.role !== currentStaff.role) {
       dbUpdate.role = updateData.role;

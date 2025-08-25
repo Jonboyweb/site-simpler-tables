@@ -32,7 +32,7 @@ export function useTableAvailability(options: UseTableAvailabilityOptions = {}) 
   const { eventDate, partySize, refreshInterval = 30000 } = options;
 
   useEffect(() => {
-    let subscription: any = null;
+    let subscription: ReturnType<typeof supabase.channel> | null = null;
     let refreshTimer: NodeJS.Timeout | null = null;
 
     const fetchTableAvailability = async () => {
@@ -51,15 +51,15 @@ export function useTableAvailability(options: UseTableAvailabilityOptions = {}) 
 
           if (functionError) throw functionError;
 
-          const tableStatuses: TableStatus[] = (data || []).map((table: any) => ({
-            id: table.table_number, // Using table_number as ID for consistency
-            table_number: table.table_number,
-            capacity_min: table.capacity_min,
-            capacity_max: table.capacity_max,
-            floor: table.floor,
-            status: table.is_available ? 'available' : 'booked',
-            description: table.description,
-            features: table.features || [],
+          const tableStatuses: TableStatus[] = (data || []).map((table: Record<string, unknown>) => ({
+            id: table.table_number as number, // Using table_number as ID for consistency
+            table_number: table.table_number as number,
+            capacity_min: table.capacity_min as number,
+            capacity_max: table.capacity_max as number,
+            floor: table.floor as 'upstairs' | 'downstairs',
+            status: (table.is_available as boolean) ? 'available' : 'booked',
+            description: table.description as string | undefined,
+            features: (table.features as string[]) || [],
             is_active: true
           }));
 
@@ -74,24 +74,25 @@ export function useTableAvailability(options: UseTableAvailabilityOptions = {}) 
 
           if (queryError) throw queryError;
 
-          const tableStatuses: TableStatus[] = (data || []).map((table: any) => ({
-            id: table.id || table.table_number,
-            table_number: table.table_number,
-            capacity_min: table.capacity_min,
-            capacity_max: table.capacity_max,
-            floor: table.floor,
-            status: table.is_available ? 'available' : 'booked',
-            description: table.description,
-            features: table.features || [],
-            can_combine_with: table.can_combine_with || [],
-            is_active: table.is_active
+          const tableStatuses: TableStatus[] = (data || []).map((table: Record<string, unknown>) => ({
+            id: (table.id as number) || (table.table_number as number),
+            table_number: table.table_number as number,
+            capacity_min: table.capacity_min as number,
+            capacity_max: table.capacity_max as number,
+            floor: table.floor as 'upstairs' | 'downstairs',
+            status: (table.is_available as boolean) ? 'available' : 'booked',
+            description: table.description as string | undefined,
+            features: (table.features as string[]) || [],
+            can_combine_with: (table.can_combine_with as number[]) || [],
+            is_active: table.is_active as boolean
           }));
 
           setTables(tableStatuses);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load table availability';
         console.error('Failed to fetch table availability:', err);
-        setError(err.message || 'Failed to load table availability');
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -165,7 +166,7 @@ export function useTableAvailability(options: UseTableAvailabilityOptions = {}) 
         clearInterval(refreshTimer);
       }
     };
-  }, [eventDate, partySize, refreshInterval]);
+  }, [eventDate, partySize, refreshInterval, supabase]);
 
   const refreshAvailability = async () => {
     setLoading(true);
@@ -182,23 +183,24 @@ export function useTableAvailability(options: UseTableAvailabilityOptions = {}) 
 
         if (error) throw error;
 
-        const tableStatuses: TableStatus[] = (data || []).map((table: any) => ({
-          id: table.table_number,
-          table_number: table.table_number,
-          capacity_min: table.capacity_min,
-          capacity_max: table.capacity_max,
-          floor: table.floor,
-          status: table.is_available ? 'available' : 'booked',
-          description: table.description,
-          features: table.features || [],
+        const tableStatuses: TableStatus[] = (data || []).map((table: Record<string, unknown>) => ({
+          id: table.table_number as number,
+          table_number: table.table_number as number,
+          capacity_min: table.capacity_min as number,
+          capacity_max: table.capacity_max as number,
+          floor: table.floor as 'upstairs' | 'downstairs',
+          status: (table.is_available as boolean) ? 'available' : 'booked',
+          description: table.description as string | undefined,
+          features: (table.features as string[]) || [],
           is_active: true
         }));
 
         setTables(tableStatuses);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to refresh availability';
       console.error('Failed to refresh table availability:', err);
-      setError(err.message || 'Failed to refresh availability');
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

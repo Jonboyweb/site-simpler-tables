@@ -14,7 +14,7 @@ export interface PaymentTestResult {
   duration: number;
   errors: string[];
   warnings: string[];
-  details?: any;
+  details?: Record<string, unknown>;
 }
 
 export interface PaymentValidationReport {
@@ -77,12 +77,13 @@ export async function validateEnvironmentSetup(): Promise<PaymentTestResult> {
       }
     };
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     return {
       success: false,
       testName: 'Environment Setup Validation',
       duration: Date.now() - startTime,
-      errors: [error.message || 'Environment validation failed'],
+      errors: [errorMessage || 'Environment validation failed'],
       warnings
     };
   }
@@ -161,7 +162,8 @@ export async function testPaymentIntentCreation(): Promise<PaymentTestResult> {
       }
     };
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     await trackPaymentError(
       'payment_intent_creation_test_failed',
       error.message,
@@ -173,7 +175,7 @@ export async function testPaymentIntentCreation(): Promise<PaymentTestResult> {
       success: false,
       testName: 'Payment Intent Creation',
       duration: Date.now() - startTime,
-      errors: [error.message || 'Test failed with unexpected error'],
+      errors: [errorMessage || 'Test failed with unexpected error'],
       warnings
     };
   }
@@ -240,12 +242,13 @@ export async function testPaymentIntentRetrieval(paymentIntentId?: string): Prom
       }
     };
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     return {
       success: false,
       testName: 'Payment Intent Retrieval',
       duration: Date.now() - startTime,
-      errors: [error.message || 'Retrieval test failed'],
+      errors: [errorMessage || 'Retrieval test failed'],
       warnings
     };
   }
@@ -310,12 +313,13 @@ export async function testWebhookSignatureVerification(): Promise<PaymentTestRes
       }
     };
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     return {
       success: false,
       testName: 'Webhook Signature Verification',
       duration: Date.now() - startTime,
-      errors: [error.message || 'Webhook verification test failed'],
+      errors: [errorMessage || 'Webhook verification test failed'],
       warnings
     };
   }
@@ -394,12 +398,13 @@ export async function testUKPaymentCompliance(): Promise<PaymentTestResult> {
       }
     };
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     return {
       success: false,
       testName: 'UK Payment Compliance',
       duration: Date.now() - startTime,
-      errors: [error.message || 'UK compliance test failed'],
+      errors: [errorMessage || 'UK compliance test failed'],
       warnings
     };
   }
@@ -504,7 +509,8 @@ export async function runPaymentValidation(): Promise<PaymentValidationReport> {
 
     return report;
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('Payment validation failed:', error);
     
     return {

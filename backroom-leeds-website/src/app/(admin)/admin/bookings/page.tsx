@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { Heading, Text, Button, LoadingSpinner } from '@/components/atoms';
 import { Card } from '@/components/molecules';
 import { createClient } from '@/lib/supabase/client';
-import type { Database } from '@/types/database.types';
 
 interface Booking {
   id: string;
@@ -18,7 +17,7 @@ interface Booking {
   arrival_time: string;
   table_ids: number[];
   status: 'pending' | 'confirmed' | 'cancelled' | 'arrived' | 'no_show';
-  special_requests?: any;
+  special_requests?: Record<string, unknown>;
   deposit_amount: number;
   package_amount?: number;
   remaining_balance: number;
@@ -50,7 +49,7 @@ export default function AdminBookingsPage() {
 
   const supabase = createClient();
 
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     try {
       setError(null);
       
@@ -71,9 +70,9 @@ export default function AdminBookingsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase, filters.date]);
 
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filtered = [...bookings];
 
     // Status filter
@@ -101,7 +100,7 @@ export default function AdminBookingsPage() {
     }
 
     setFilteredBookings(filtered);
-  };
+  }, [bookings, filters]);
 
   const handleCheckIn = async (bookingId: string, bookingRef: string) => {
     if (!session?.user?.permissions?.canCheckInCustomers) {
@@ -204,11 +203,11 @@ export default function AdminBookingsPage() {
     return () => {
       bookingsSubscription.unsubscribe();
     };
-  }, [filters.date]);
+  }, [filters.date, fetchBookings, supabase]);
 
   useEffect(() => {
     applyFilters();
-  }, [bookings, filters]);
+  }, [applyFilters]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -561,7 +560,7 @@ export default function AdminBookingsPage() {
       {/* Stats Summary */}
       <Card className="p-6">
         <Heading level={2} className="text-xl font-bebas text-speakeasy-gold mb-4">
-          Today's Summary
+          Today&apos;s Summary
         </Heading>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           {[
