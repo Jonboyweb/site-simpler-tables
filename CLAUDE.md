@@ -2,6 +2,23 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## ⚠️ CRITICAL: Implementation Guide Compliance
+
+**MANDATORY**: All development work MUST follow the detailed implementation guide:
+- **Primary Reference**: `/backroom-implementation-guide.md` 
+- **Status**: This is the AUTHORITATIVE development process document
+- **Requirement**: ALWAYS consult this guide BEFORE any implementation work
+- **Compliance**: Every step must match the guide's exact specifications
+
+### Implementation Guide Enforcement:
+1. **Research Requirements**: All code patterns must reference official documentation per the guide
+2. **Testing Requirements**: Minimum 80% test coverage with specific test types outlined
+3. **Documentation Requirements**: Specific file formats and locations are mandated
+4. **Git Workflow**: Commit messages must follow the guide's specified format
+5. **Agent Communication**: Inter-agent protocols are defined and must be followed
+
+**NEVER deviate from the implementation guide without explicit approval.**
+
 ## Development Commands
 
 ### Core Development Workflow
@@ -40,14 +57,27 @@ site-simpler-tables/
 
 ### Reference Materials for Development
 
+#### 📋 Implementation Guide (`/backroom-implementation-guide.md`) - PRIMARY REFERENCE
+**MOST IMPORTANT**: Comprehensive step-by-step implementation guide containing:
+- **Phase Structure**: 5 detailed implementation phases with specific deliverables
+- **Agent Responsibilities**: Clear role definitions and communication protocols
+- **Documentation Requirements**: Exact file paths, formats, and content specifications
+- **Testing Strategy**: Unit, integration, and E2E test requirements with coverage targets
+- **Git Workflow**: Specific commit message formats and branching strategies
+- **Error Handling Protocol**: Detailed procedures for documenting and resolving issues
+- **Progress Tracking**: Daily standup formats and milestone tracking requirements
+
+**CRITICAL**: This guide overrides any conflicting information in other documents.
+
 #### 🤖 AI Agent Configurations (`/agents/`)
 Specialized agent configurations for domain-specific development tasks:
-- **Frontend Specialists**: UI/UX agent, design system agent with prohibition theming
-- **Backend Specialists**: API agent, performance agent for optimization
-- **Quality Assurance**: Testing agent, security agent for compliance
-- **Content & Documentation**: Content agent, documentation agent
+- **Research Agent**: Official documentation research and validation
+- **Architecture Agent**: System design and technical planning
+- **Development Agent**: Code implementation with test creation
+- **Testing Agent**: Test execution and validation
+- **Documentation Agent**: Project documentation maintenance
 
-**Usage**: Agents auto-activate based on task complexity and file patterns. Use for specialized development work requiring domain expertise.
+**Usage**: Follow implementation guide agent protocols for task assignment and communication.
 
 #### 🔍 Market Research & Intelligence (`/backroom-leeds-website/research/`)
 Comprehensive venue and market intelligence for informed development decisions:
@@ -152,10 +182,36 @@ The project uses a **prohibition-era speakeasy theme** with:
 - **User Roles**: Three-tier admin system with granular permissions
 
 ## Important Notes
+
+### 🚨 IMPLEMENTATION GUIDE COMPLIANCE - MANDATORY
+- **PRIMARY REFERENCE**: `/backroom-implementation-guide.md` - ALWAYS consult FIRST before any work
+- **Exact Specifications**: Follow the guide's precise documentation formats, file locations, and naming conventions
+- **Testing Requirements**: Implement ALL testing levels specified (unit, integration, E2E) with minimum 80% coverage
+- **Research Validation**: Every code pattern MUST reference official documentation sources
+- **Agent Protocols**: Use specified inter-agent communication formats and workflows
+- **Error Documentation**: Follow the guide's error handling and resolution protocols
+- **Git Workflow**: Use exact commit message formats and progress tracking specified
+
+### Development Context
 - **Development Priority**: Main codebase is in `backroom-leeds-website/` directory
-- **Reference First**: Always consult `backroom-tech-spec.md` for technical requirements before implementation
+- **Technical Specifications**: Consult `backroom-tech-spec.md` for technical requirements (secondary to implementation guide)
 - **Real Data Available**: Use venue-specific information and research data for authentic implementation
-- **Agent Support**: Leverage specialized agent configurations in `/agents/` for domain-specific tasks
-- **Testing Setup Required**: No test framework currently configured - use specifications to guide test implementation
-- **Backend Integration Pending**: Database (Supabase) and payment (Stripe) integration specified but not implemented
-- **Current State**: Frontend presentation layer complete with prohibition theming and component structure
+- **Current State**: Phase 1 (Research & Planning) completed - proceeding to Phase 2 (Project Setup & Configuration)
+
+## 📋 Implementation Guide Workflow Reminders
+
+### Before Any Development Task:
+1. **ALWAYS** read the relevant section in `/backroom-implementation-guide.md` first
+2. Follow the guide's exact specifications for file locations and formats
+3. Use the specified agent communication protocols
+4. Implement ALL required testing levels with specified coverage
+5. Document using the guide's exact templates and formats
+
+### Key Implementation Guide Requirements:
+- **Documentation**: Create files in exact locations specified (e.g., `/docs/research/`, `/docs/architecture/`)
+- **Testing**: Minimum 80% coverage with unit, integration, and E2E tests
+- **Git Commits**: Use specific format with research sources and test results
+- **Agent Communication**: Follow defined message formats and protocols
+- **Error Handling**: Document all errors with resolution logs per the guide's protocol
+
+**The implementation guide is the single source of truth for all development processes.**
