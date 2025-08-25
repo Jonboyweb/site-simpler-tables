@@ -4,75 +4,103 @@ interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
-// Mock event data for development/demonstration
-const mockEvents = {
-  'la-fiesta-2025-01-31': {
-    id: 'la-fiesta-2025-01-31',
-    event: {
-      id: 'la-fiesta',
-      name: 'LA FIESTA',
-      slug: 'la-fiesta',
-      description: 'The ultimate Latin party experience with vibrant beats, tropical cocktails, and electric atmosphere. Dance the night away to reggaeton, bachata, and Latin house music.',
-      day_of_week: 5, // Friday
-      start_time: '23:00',
-      end_time: '03:00',
-      dj_lineup: ['DJ Carlos Rodriguez', 'MC Latina', 'DJ Tropical'],
-      music_genres: ['Reggaeton', 'Bachata', 'Latin House', 'Merengue'],
-      image_url: '/images/events/la-fiesta.jpg',
-      ticket_url: 'https://fatsoma.com/the-backroom-la-fiesta',
-      is_active: true,
-      is_recurring: true,
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-15T00:00:00Z'
-    },
-    date: new Date('2025-01-31T23:00:00Z'),
-    soldOut: false
+// Event templates for dynamic generation
+const eventTemplates = {
+  'la-fiesta': {
+    id: 'la-fiesta',
+    name: 'LA FIESTA',
+    slug: 'la-fiesta',
+    description: 'The hottest Latin night in Leeds! Experience the energy of reggaeton, Latin house, and salsa hits that will keep you dancing until dawn.',
+    day_of_week: 5, // Friday
+    start_time: '23:00:00',
+    end_time: '06:00:00',
+    dj_lineup: ['DJ Rodriguez', 'Latin Collective'],
+    music_genres: ['Reggaeton', 'Latin House', 'Salsa', 'Bachata'],
+    image_url: null,
+    ticket_url: 'https://fatsoma.com/la-fiesta-backroom-leeds',
+    is_active: true,
+    is_recurring: true,
+    created_at: null,
+    updated_at: null,
   },
-  'shhh-2025-02-01': {
-    id: 'shhh-2025-02-01',
-    event: {
-      id: 'shhh',
-      name: 'SHHH!',
-      slug: 'shhh',
-      description: 'An intimate underground experience featuring deep house, techno, and progressive beats. Premium cocktails and sophisticated atmosphere for the discerning music lover.',
-      day_of_week: 6, // Saturday
-      start_time: '23:30',
-      end_time: '03:30',
-      dj_lineup: ['Deep House Dan', 'Techno Tom', 'Progressive Pete'],
-      music_genres: ['Deep House', 'Techno', 'Progressive House'],
-      image_url: '/images/events/shhh.jpg',
-      ticket_url: 'https://fatsoma.com/the-backroom-shhh',
-      is_active: true,
-      is_recurring: true,
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-15T00:00:00Z'
-    },
-    date: new Date('2025-02-01T23:30:00Z'),
-    soldOut: false
+  'shhh': {
+    id: 'shhh',
+    name: 'SHHH!',
+    slug: 'shhh',
+    description: 'An intimate journey through deep house and underground beats. Discover hidden gems and exclusive tracks in the heart of our speakeasy.',
+    day_of_week: 6, // Saturday
+    start_time: '23:00:00',
+    end_time: '06:00:00',
+    dj_lineup: ['Luna Beats', 'Underground Collective', 'Deep House Society'],
+    music_genres: ['Deep House', 'Tech House', 'Underground', 'Progressive'],
+    image_url: null,
+    ticket_url: 'https://fatsoma.com/shhh-backroom-leeds',
+    is_active: true,
+    is_recurring: true,
+    created_at: null,
+    updated_at: null,
   },
-  'nostalgia-2025-02-02': {
-    id: 'nostalgia-2025-02-02',
-    event: {
-      id: 'nostalgia',
-      name: 'NOSTALGIA',
-      slug: 'nostalgia',
-      description: 'A journey through time with classic hits from the 80s, 90s, and 2000s. Vintage cocktails and retro vibes in our authentic speakeasy setting.',
-      day_of_week: 0, // Sunday
-      start_time: '22:00',
-      end_time: '02:00',
-      dj_lineup: ['Retro Rick', 'Classic Claire', 'Vintage Vince'],
-      music_genres: ['80s Hits', '90s Classics', '2000s Anthems', 'Disco'],
-      image_url: '/images/events/nostalgia.jpg',
-      ticket_url: 'https://fatsoma.com/the-backroom-nostalgia',
-      is_active: true,
-      is_recurring: true,
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-15T00:00:00Z'
-    },
-    date: new Date('2025-02-02T22:00:00Z'),
-    soldOut: false
+  'nostalgia': {
+    id: 'nostalgia',
+    name: 'NOSTALGIA',
+    slug: 'nostalgia',
+    description: 'Take a trip down memory lane with timeless classics and the music that shaped generations. From vintage soul to classic hits.',
+    day_of_week: 0, // Sunday
+    start_time: '23:00:00',
+    end_time: '05:00:00',
+    dj_lineup: ['Vintage Vibes', 'Classic Collective'],
+    music_genres: ['Classic Hits', 'Vintage Soul', 'Retro Pop', '90s Dance'],
+    image_url: null,
+    ticket_url: 'https://fatsoma.com/nostalgia-backroom-leeds',
+    is_active: true,
+    is_recurring: true,
+    created_at: null,
+    updated_at: null,
   }
 };
+
+/**
+ * Parse event ID to extract slug and date
+ * Format: "la-fiesta-2025-08-29" -> { slug: "la-fiesta", dateStr: "2025-08-29" }
+ */
+function parseEventId(eventId: string): { slug: string; dateStr: string } | null {
+  // Split by hyphen and rejoin - the format is: slug-YYYY-MM-DD
+  const parts = eventId.split('-');
+  
+  if (parts.length < 4) return null;
+  
+  // The last 3 parts should be year, month, day
+  const dateStr = parts.slice(-3).join('-');
+  const slug = parts.slice(0, -3).join('-');
+  
+  // Validate date format
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return null;
+  
+  return { slug, dateStr };
+}
+
+/**
+ * Generate event instance from template and date
+ */
+function generateEventInstance(slug: string, dateStr: string) {
+  const template = eventTemplates[slug as keyof typeof eventTemplates];
+  if (!template) return null;
+  
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return null;
+  
+  // Set the time based on event template
+  const [hours, minutes] = template.start_time.split(':').map(Number);
+  date.setHours(hours, minutes, 0, 0);
+  
+  return {
+    id: `${slug}-${dateStr}`,
+    event: template,
+    date,
+    soldOut: false, // In real app, this would be checked against bookings
+  };
+}
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
@@ -86,9 +114,17 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Mock database lookup
-    const eventInstance = mockEvents[id as keyof typeof mockEvents];
+    // Parse the event ID to extract slug and date
+    const parsed = parseEventId(id);
+    if (!parsed) {
+      return NextResponse.json(
+        { error: 'Invalid event ID format. Expected format: slug-YYYY-MM-DD' },
+        { status: 400 }
+      );
+    }
 
+    // Generate event instance from template
+    const eventInstance = generateEventInstance(parsed.slug, parsed.dateStr);
     if (!eventInstance) {
       return NextResponse.json(
         { error: 'Event not found' },
@@ -110,10 +146,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-// For development - list available mock events
+// For development - list available event templates
 export async function OPTIONS() {
   return NextResponse.json({
-    available_events: Object.keys(mockEvents),
+    available_event_templates: Object.keys(eventTemplates),
+    id_format: 'slug-YYYY-MM-DD (e.g., la-fiesta-2025-08-29)',
     note: 'This is a mock API for development. In production, this would connect to the Supabase database.'
   });
 }

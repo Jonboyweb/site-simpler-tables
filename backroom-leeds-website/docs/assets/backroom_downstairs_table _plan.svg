@@ -1,0 +1,173 @@
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <!-- Gradients for Art Deco styling -->
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4AF37;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B8860B;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="darkGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2C1810;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1A0F08;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Patterns for textures -->
+    <pattern id="woodPattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <rect width="40" height="40" fill="#3E2723"/>
+      <line x1="0" y1="0" x2="0" y2="40" stroke="#5D4037" stroke-width="0.5"/>
+      <line x1="10" y1="0" x2="10" y2="40" stroke="#5D4037" stroke-width="0.5"/>
+      <line x1="20" y1="0" x2="20" y2="40" stroke="#5D4037" stroke-width="0.5"/>
+      <line x1="30" y1="0" x2="30" y2="40" stroke="#5D4037" stroke-width="0.5"/>
+    </pattern>
+    
+    <!-- Table styles -->
+    <style>
+      .table {
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .table:hover .table-fill {
+        fill: #D4AF37;
+        fill-opacity: 0.8;
+      }
+      .table:hover .table-stroke {
+        stroke: #FFD700;
+        stroke-width: 3;
+      }
+      .table-text {
+        font-family: 'Georgia', serif;
+        fill: #D4AF37;
+        font-weight: bold;
+        pointer-events: none;
+      }
+      .capacity-text {
+        font-family: 'Arial', sans-serif;
+        fill: #B8860B;
+        font-size: 14px;
+        pointer-events: none;
+      }
+      .floor-label {
+        font-family: 'Georgia', serif;
+        font-size: 36px;
+        fill: #D4AF37;
+        text-anchor: middle;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      }
+      .area-label {
+        font-family: 'Georgia', serif;
+        font-size: 24px;
+        fill: #B8860B;
+        text-anchor: middle;
+      }
+      .available {
+        fill: #2E7D32;
+        fill-opacity: 0.3;
+      }
+      .booked {
+        fill: #B71C1C;
+        fill-opacity: 0.3;
+      }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="#1A0F08"/>
+  
+  <!-- Art Deco border -->
+  <rect x="20" y="20" width="1160" height="760" fill="none" stroke="url(#goldGradient)" stroke-width="4"/>
+  <rect x="30" y="30" width="1140" height="740" fill="none" stroke="url(#goldGradient)" stroke-width="2"/>
+  
+  <!-- Downstairs Section -->
+  <g id="downstairs">
+    <text x="600" y="80" class="floor-label">DOWNSTAIRS</text>
+    
+    <!-- Downstairs Bar -->
+    <rect x="350" y="120" width="500" height="80" fill="url(#darkGradient)" stroke="url(#goldGradient)" stroke-width="2"/>
+    <text x="600" y="170" class="area-label">Downstairs Bar</text>
+    
+    <!-- Downstairs Dance Floor -->
+    <rect x="300" y="300" width="600" height="250" fill="url(#woodPattern)" stroke="url(#goldGradient)" stroke-width="2"/>
+    <text x="600" y="425" class="area-label">Dance Floor</text>
+    
+    <!-- DJ Booth Downstairs -->
+    <g transform="translate(150, 650)">
+      <rect x="-30" y="-50" width="100" height="80" fill="url(#darkGradient)" stroke="url(#goldGradient)" stroke-width="2" transform="rotate(45)"/>
+      <text x="20" y="10" text-anchor="middle" class="capacity-text">DJ Booth</text>
+    </g>
+    
+    <!-- Tables Downstairs -->
+    <!-- Table 11 -->
+    <g class="table" data-table="11" data-capacity="2-8" transform="translate(800, 650)">
+      <circle class="table-fill available" r="45" fill="#2E7D32" fill-opacity="0.3"/>
+      <circle class="table-stroke" r="45" fill="none" stroke="#B8860B" stroke-width="2"/>
+      <text x="0" y="-5" text-anchor="middle" class="table-text" font-size="16">Table 11</text>
+      <text x="0" y="12" text-anchor="middle" class="capacity-text" font-size="12">(2-8)</text>
+    </g>
+    
+    <!-- Table 12 -->
+    <g class="table" data-table="12" data-capacity="2-8" transform="translate(650, 650)">
+      <circle class="table-fill available" r="45" fill="#2E7D32" fill-opacity="0.3"/>
+      <circle class="table-stroke" r="45" fill="none" stroke="#B8860B" stroke-width="2"/>
+      <text x="0" y="-5" text-anchor="middle" class="table-text" font-size="16">Table 12</text>
+      <text x="0" y="12" text-anchor="middle" class="capacity-text" font-size="12">(2-8)</text>
+    </g>
+    
+    <!-- Table 13 -->
+    <g class="table" data-table="13" data-capacity="2-8" transform="translate(200, 500)">
+      <circle class="table-fill available" r="45" fill="#2E7D32" fill-opacity="0.3"/>
+      <circle class="table-stroke" r="45" fill="none" stroke="#B8860B" stroke-width="2"/>
+      <text x="0" y="-5" text-anchor="middle" class="table-text" font-size="16">Table 13</text>
+      <text x="0" y="12" text-anchor="middle" class="capacity-text" font-size="12">(2-8)</text>
+    </g>
+    
+    <!-- Table 14 -->
+    <g class="table" data-table="14" data-capacity="2-8" transform="translate(200, 350)">
+      <circle class="table-fill available" r="45" fill="#2E7D32" fill-opacity="0.3"/>
+      <circle class="table-stroke" r="45" fill="none" stroke="#B8860B" stroke-width="2"/>
+      <text x="0" y="-5" text-anchor="middle" class="table-text" font-size="16">Table 14</text>
+      <text x="0" y="12" text-anchor="middle" class="capacity-text" font-size="12">(2-8)</text>
+    </g>
+    
+    <!-- Table 15 -->
+    <g class="table" data-table="15" data-capacity="4-10" transform="translate(975, 350)">
+      <rect class="table-fill available" x="-55" y="-35" width="110" height="70" rx="10" fill="#2E7D32" fill-opacity="0.3"/>
+      <rect class="table-stroke" x="-55" y="-35" width="110" height="70" rx="10" fill="none" stroke="#B8860B" stroke-width="2"/>
+      <text x="0" y="-5" text-anchor="middle" class="table-text" font-size="18">Table 15</text>
+      <text x="0" y="15" text-anchor="middle" class="capacity-text">(2-6 people)</text>
+    </g>
+    
+    <!-- Table 16 (additional for downstairs) -->
+    <g class="table" data-table="16" data-capacity="4-10" transform="translate(925, 250)">
+      <rect class="table-fill available" x="-55" y="-35" width="110" height="70" rx="10" fill="#2E7D32" fill-opacity="0.3"/>
+      <rect class="table-stroke" x="-55" y="-35" width="110" height="70" rx="10" fill="none" stroke="#B8860B" stroke-width="2"/>
+      <text x="0" y="-5" text-anchor="middle" class="table-text" font-size="18">Table 16</text>
+      <text x="0" y="15" text-anchor="middle" class="capacity-text">(2-6 people)</text>
+    </g>
+  </g>
+  
+  <!-- Legend -->
+  <g transform="translate(50, 730)">
+    <rect x="0" y="0" width="30" height="20" class="available" stroke="#B8860B" stroke-width="1"/>
+    <text x="40" y="15" font-family="Arial" font-size="14" fill="#D4AF37">Available</text>
+    
+    <rect x="150" y="0" width="30" height="20" class="booked" stroke="#B8860B" stroke-width="1"/>
+    <text x="190" y="15" font-family="Arial" font-size="14" fill="#D4AF37">Booked</text>
+  </g>
+  
+  <!-- Interactive JavaScript -->
+  <script type="text/javascript">
+    <![CDATA[
+    // Add click handlers for tables
+    document.querySelectorAll('.table').forEach(table => {
+      table.addEventListener('click', function() {
+        const tableId = this.getAttribute('data-table');
+        const capacity = this.getAttribute('data-capacity');
+        // This would trigger your booking system
+        console.log(`Table ${tableId} clicked - Capacity: ${capacity}`);
+        // Example: window.bookTable(tableId, capacity);
+      });
+    });
+    ]]>
+  </script>
+</svg>

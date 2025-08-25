@@ -335,7 +335,9 @@ export function BNPLPayment({
           }
         } else {
           setError('Klarna payment was not approved');
-          onError?('Payment not approved');
+          if (onError) {
+            onError('Payment not approved');
+          }
         }
         setIsLoading(false);
       }

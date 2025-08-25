@@ -43,6 +43,10 @@ export function EventBookingWrapper({ eventId, className = '' }: EventBookingWra
         }
 
         const data = await response.json();
+        // Convert date string back to Date object
+        if (data.date) {
+          data.date = new Date(data.date);
+        }
         setEventInstance(data);
       } catch (err) {
         console.error('Error fetching event instance:', err);

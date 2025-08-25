@@ -35,9 +35,58 @@ export function useTableAvailability(options: UseTableAvailabilityOptions = {}) 
     let subscription: ReturnType<typeof supabase.channel> | null = null;
     let refreshTimer: NodeJS.Timeout | null = null;
 
+    // Check if we're in development mode and should use mock data
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const isLocalSupabase = supabaseUrl?.includes('127.0.0.1') || supabaseUrl?.includes('localhost');
+
+    const getMockTableData = (): TableStatus[] => {
+      // Mock data for development when Supabase is not available
+      const mockTables: TableStatus[] = [
+        { id: 1, table_number: 1, capacity_min: 2, capacity_max: 4, floor: 'upstairs', status: 'available', is_active: true, features: ['Window view'] },
+        { id: 2, table_number: 2, capacity_min: 4, capacity_max: 6, floor: 'upstairs', status: 'available', is_active: true, features: ['Premium seating'] },
+        { id: 3, table_number: 3, capacity_min: 2, capacity_max: 4, floor: 'upstairs', status: 'booked', is_active: true },
+        { id: 4, table_number: 4, capacity_min: 6, capacity_max: 8, floor: 'upstairs', status: 'available', is_active: true, features: ['VIP section'] },
+        { id: 5, table_number: 5, capacity_min: 2, capacity_max: 4, floor: 'downstairs', status: 'available', is_active: true },
+        { id: 6, table_number: 6, capacity_min: 4, capacity_max: 6, floor: 'downstairs', status: 'available', is_active: true },
+        { id: 7, table_number: 7, capacity_min: 6, capacity_max: 8, floor: 'downstairs', status: 'booked', is_active: true },
+        { id: 8, table_number: 8, capacity_min: 8, capacity_max: 10, floor: 'downstairs', status: 'available', is_active: true, features: ['Dance floor adjacent'] },
+      ];
+
+      // Filter by party size if provided
+      if (partySize) {
+        return mockTables.filter(table => 
+          table.capacity_min <= partySize && table.capacity_max >= partySize
+        );
+      }
+
+      return mockTables;
+    };
+
     const fetchTableAvailability = async () => {
       try {
         setError(null);
+        
+        // Use mock data in development if Supabase is not accessible
+        if (isDevelopment && isLocalSupabase) {
+          try {
+            // Test Supabase connection first
+            const { error: testError } = await supabase.from('venue_tables').select('id').limit(1);
+            if (testError) {
+              // Supabase not available, use mock data
+              console.warn('Supabase not available, using mock data for table availability');
+              setTables(getMockTableData());
+              setLoading(false);
+              return;
+            }
+          } catch (connectionError) {
+            // Connection failed, use mock data
+            console.warn('Supabase connection failed, using mock data for table availability');
+            setTables(getMockTableData());
+            setLoading(false);
+            return;
+          }
+        }
         
         if (eventDate && partySize) {
           // Use the check_table_availability function for specific date and party size
@@ -92,13 +141,26 @@ export function useTableAvailability(options: UseTableAvailabilityOptions = {}) 
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to load table availability';
         console.error('Failed to fetch table availability:', err);
-        setError(errorMessage);
+        
+        // In development, fall back to mock data on error
+        if (isDevelopment) {
+          console.warn('Falling back to mock data due to error:', errorMessage);
+          setTables(getMockTableData());
+        } else {
+          setError(errorMessage);
+        }
       } finally {
         setLoading(false);
       }
     };
 
     const setupRealtimeSubscription = () => {
+      // Skip real-time subscriptions in development if using local Supabase that's not available
+      if (isDevelopment && isLocalSupabase) {
+        console.log('Skipping real-time subscription in development mode');
+        return;
+      }
+
       // Subscribe to bookings changes to update table availability in real-time
       subscription = supabase
         .channel('table-availability-updates')
@@ -133,8 +195,11 @@ export function useTableAvailability(options: UseTableAvailabilityOptions = {}) 
           if (status === 'SUBSCRIBED') {
             console.log('Real-time subscription established for table availability');
           } else if (status === 'CHANNEL_ERROR') {
-            console.error('Real-time subscription error');
-            setError('Real-time updates unavailable');
+            console.warn('Real-time subscription error - falling back to polling');
+            // Don't set error state, just fall back to polling
+            if (refreshInterval > 0) {
+              setupRefreshTimer();
+            }
           }
         });
     };
@@ -151,11 +216,13 @@ export function useTableAvailability(options: UseTableAvailabilityOptions = {}) 
     // Initial fetch
     fetchTableAvailability();
     
-    // Setup real-time subscription
+    // Setup real-time subscription (will be skipped in development)
     setupRealtimeSubscription();
     
     // Setup periodic refresh as backup
-    setupRefreshTimer();
+    if (!isDevelopment || !isLocalSupabase) {
+      setupRefreshTimer();
+    }
 
     // Cleanup function
     return () => {
@@ -172,6 +239,55 @@ export function useTableAvailability(options: UseTableAvailabilityOptions = {}) 
     setLoading(true);
     
     try {
+      // Check if we're in development mode and should use mock data
+      const isDevelopment = process.env.NODE_ENV === 'development';
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const isLocalSupabase = supabaseUrl?.includes('127.0.0.1') || supabaseUrl?.includes('localhost');
+
+      const getMockTableData = (): TableStatus[] => {
+        // Mock data for development when Supabase is not available
+        const mockTables: TableStatus[] = [
+          { id: 1, table_number: 1, capacity_min: 2, capacity_max: 4, floor: 'upstairs', status: 'available', is_active: true, features: ['Window view'] },
+          { id: 2, table_number: 2, capacity_min: 4, capacity_max: 6, floor: 'upstairs', status: 'available', is_active: true, features: ['Premium seating'] },
+          { id: 3, table_number: 3, capacity_min: 2, capacity_max: 4, floor: 'upstairs', status: 'booked', is_active: true },
+          { id: 4, table_number: 4, capacity_min: 6, capacity_max: 8, floor: 'upstairs', status: 'available', is_active: true, features: ['VIP section'] },
+          { id: 5, table_number: 5, capacity_min: 2, capacity_max: 4, floor: 'downstairs', status: 'available', is_active: true },
+          { id: 6, table_number: 6, capacity_min: 4, capacity_max: 6, floor: 'downstairs', status: 'available', is_active: true },
+          { id: 7, table_number: 7, capacity_min: 6, capacity_max: 8, floor: 'downstairs', status: 'booked', is_active: true },
+          { id: 8, table_number: 8, capacity_min: 8, capacity_max: 10, floor: 'downstairs', status: 'available', is_active: true, features: ['Dance floor adjacent'] },
+        ];
+
+        // Filter by party size if provided
+        if (partySize) {
+          return mockTables.filter(table => 
+            table.capacity_min <= partySize && table.capacity_max >= partySize
+          );
+        }
+
+        return mockTables;
+      };
+
+      // Use mock data in development if Supabase is not accessible
+      if (isDevelopment && isLocalSupabase) {
+        try {
+          // Test Supabase connection first
+          const { error: testError } = await supabase.from('venue_tables').select('id').limit(1);
+          if (testError) {
+            // Supabase not available, use mock data
+            console.warn('Supabase not available during refresh, using mock data');
+            setTables(getMockTableData());
+            setLoading(false);
+            return;
+          }
+        } catch (connectionError) {
+          // Connection failed, use mock data
+          console.warn('Supabase connection failed during refresh, using mock data');
+          setTables(getMockTableData());
+          setLoading(false);
+          return;
+        }
+      }
+      
       if (eventDate && partySize) {
         const { data, error } = await supabase.rpc(
           'check_table_availability',
@@ -200,7 +316,34 @@ export function useTableAvailability(options: UseTableAvailabilityOptions = {}) 
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to refresh availability';
       console.error('Failed to refresh table availability:', err);
-      setError(errorMessage);
+      
+      // In development, fall back to mock data on error
+      const isDevelopment = process.env.NODE_ENV === 'development';
+      if (isDevelopment) {
+        console.warn('Falling back to mock data due to refresh error:', errorMessage);
+        // Reuse the mock data logic
+        const getMockTableData = (): TableStatus[] => {
+          const mockTables: TableStatus[] = [
+            { id: 1, table_number: 1, capacity_min: 2, capacity_max: 4, floor: 'upstairs', status: 'available', is_active: true, features: ['Window view'] },
+            { id: 2, table_number: 2, capacity_min: 4, capacity_max: 6, floor: 'upstairs', status: 'available', is_active: true, features: ['Premium seating'] },
+            { id: 3, table_number: 3, capacity_min: 2, capacity_max: 4, floor: 'upstairs', status: 'booked', is_active: true },
+            { id: 4, table_number: 4, capacity_min: 6, capacity_max: 8, floor: 'upstairs', status: 'available', is_active: true, features: ['VIP section'] },
+            { id: 5, table_number: 5, capacity_min: 2, capacity_max: 4, floor: 'downstairs', status: 'available', is_active: true },
+            { id: 6, table_number: 6, capacity_min: 4, capacity_max: 6, floor: 'downstairs', status: 'available', is_active: true },
+            { id: 7, table_number: 7, capacity_min: 6, capacity_max: 8, floor: 'downstairs', status: 'booked', is_active: true },
+            { id: 8, table_number: 8, capacity_min: 8, capacity_max: 10, floor: 'downstairs', status: 'available', is_active: true, features: ['Dance floor adjacent'] },
+          ];
+          if (partySize) {
+            return mockTables.filter(table => 
+              table.capacity_min <= partySize && table.capacity_max >= partySize
+            );
+          }
+          return mockTables;
+        };
+        setTables(getMockTableData());
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
