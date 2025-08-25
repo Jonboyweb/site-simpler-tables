@@ -24,6 +24,60 @@ npm test            # No test framework configured yet
 ### Working Directory
 The main codebase is located in `backroom-leeds-website/` - this is where all development work should be focused.
 
+## Project Structure & Reference Materials
+
+### Root Directory Organization
+```
+site-simpler-tables/
+├── agents/                     # 🤖 AI agent configurations for specialized tasks
+├── backroom-leeds-website/     # 🏗️ Main Next.js application
+│   ├── research/              # 🔍 Market research & venue intelligence
+│   └── [src, docs, tests...]  # Core application files
+├── backroom-tech-spec.md      # 📋 Complete technical specifications
+├── CLAUDE.md                  # 📝 This development guide
+└── [other project files]
+```
+
+### Reference Materials for Development
+
+#### 🤖 AI Agent Configurations (`/agents/`)
+Specialized agent configurations for domain-specific development tasks:
+- **Frontend Specialists**: UI/UX agent, design system agent with prohibition theming
+- **Backend Specialists**: API agent, performance agent for optimization
+- **Quality Assurance**: Testing agent, security agent for compliance
+- **Content & Documentation**: Content agent, documentation agent
+
+**Usage**: Agents auto-activate based on task complexity and file patterns. Use for specialized development work requiring domain expertise.
+
+#### 🔍 Market Research & Intelligence (`/backroom-leeds-website/research/`)
+Comprehensive venue and market intelligence for informed development decisions:
+- **Market Analysis**: Leeds nightlife landscape, speakeasy trends, customer demographics
+- **Competitive Intelligence**: Competitor analysis, pricing strategies, digital presence
+- **Customer Insights**: Behavior patterns, booking preferences, user experience data
+- **Technical Benchmarks**: Technology stack comparisons, performance metrics
+
+**Usage**: Reference for feature requirements, UX decisions, and business logic implementation. Contains real market data to inform booking system design and venue operations.
+
+#### 📋 Technical Specifications (`/backroom-tech-spec.md`)
+Complete technical specification document containing:
+- **Database Schema**: Table structures, relationships, constraints
+- **API Endpoints**: RESTful API design with authentication flows
+- **Payment Integration**: Stripe implementation details and webhook handling
+- **Authentication**: 2FA implementation with role-based access control
+- **Real-time Features**: WebSocket events and Supabase subscriptions
+
+**Usage**: Primary reference for all technical implementation decisions. Contains exact specifications for booking system, admin dashboard, and venue management features.
+
+#### 🎭 Venue-Specific Information
+Located throughout the project structure, containing real venue data:
+- **Table Configuration**: 16 tables across upstairs/downstairs with capacity constraints
+- **Event Information**: Weekly events (LA FIESTA, SHHH!, NOSTALGIA) with DJ lineups
+- **Drinks Packages**: Actual pricing and package configurations (£170-£580 range)
+- **Venue Layout**: Floor plans and seating arrangements for booking system
+- **Business Rules**: Real operating constraints (2-table limit, 48-hour cancellation policy)
+
+**Usage**: Essential for accurate booking system logic, pricing calculations, and venue-specific user experience.
+
 ## High-Level Architecture
 
 ### Project Overview
@@ -98,7 +152,10 @@ The project uses a **prohibition-era speakeasy theme** with:
 - **User Roles**: Three-tier admin system with granular permissions
 
 ## Important Notes
-- No test framework is currently configured - tests will need to be set up
-- Database integration with Supabase is planned but not yet implemented
-- Payment processing with Stripe is specified but not yet integrated
-- The current implementation focuses on the frontend presentation layer
+- **Development Priority**: Main codebase is in `backroom-leeds-website/` directory
+- **Reference First**: Always consult `backroom-tech-spec.md` for technical requirements before implementation
+- **Real Data Available**: Use venue-specific information and research data for authentic implementation
+- **Agent Support**: Leverage specialized agent configurations in `/agents/` for domain-specific tasks
+- **Testing Setup Required**: No test framework currently configured - use specifications to guide test implementation
+- **Backend Integration Pending**: Database (Supabase) and payment (Stripe) integration specified but not implemented
+- **Current State**: Frontend presentation layer complete with prohibition theming and component structure
