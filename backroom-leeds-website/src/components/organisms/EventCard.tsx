@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
 import { Badge, Heading, Text, CalendarIcon, ClockIcon } from '@/components/atoms';
 import type { EventCardProps } from '@/types/components';
 
@@ -25,7 +24,8 @@ export const EventCard = ({
   showBookingCTA = true,
   eventType,
 }: EnhancedEventCardProps) => {
-  const [tablesRemaining] = useState<number>(availableTables || 16);
+  // Use availableTables directly instead of state to prevent hydration issues
+  const tablesRemaining = availableTables || 16;
 
   const formattedDate = new Intl.DateTimeFormat('en-GB', {
     weekday: 'long',

@@ -24,11 +24,17 @@ export function EventsList({ events }: EventsListProps) {
     return undefined;
   };
 
-  // Helper function to get random available tables (simulation)
+  // Helper function to get available tables (deterministic simulation)
   const getAvailableTables = (eventInstance: EventInstance) => {
     // In a real app, this would fetch from API
-    // For now, simulate based on event type and date
-    const baseAvailability = eventInstance.soldOut ? 0 : Math.floor(Math.random() * 16) + 1;
+    // For now, simulate based on event type and date using deterministic calculation
+    if (eventInstance.soldOut) return 0;
+    
+    // Create a deterministic "random" value based on event ID and date
+    const seed = eventInstance.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const dateHash = new Date(eventInstance.date).getTime() % 1000;
+    const combinedSeed = (seed + dateHash) % 16;
+    const baseAvailability = Math.max(1, combinedSeed + 1);
     
     // LA FIESTA (popular) typically has fewer tables
     if (getEventType(eventInstance.event.name) === 'LA_FIESTA') {
