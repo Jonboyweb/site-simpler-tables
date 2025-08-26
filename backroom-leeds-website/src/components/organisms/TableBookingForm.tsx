@@ -36,6 +36,7 @@ export const TableBookingForm = ({
   onSubmit,
   step = 1,
   eventId,
+  loading = false,
 }: TableBookingFormProps) => {
   const [formData, setFormData] = useState<BookingFormData>({
     date: '',
@@ -249,8 +250,16 @@ export const TableBookingForm = ({
           </Card>
 
           {/* Submit Button */}
-          <Button type="submit" variant="gold" size="lg" fullWidth artDeco>
-            Complete Booking
+          <Button 
+            type="submit" 
+            variant="gold" 
+            size="lg" 
+            fullWidth 
+            artDeco
+            loading={loading}
+            disabled={loading}
+          >
+            {loading ? 'Processing...' : 'Complete Booking'}
           </Button>
         </form>
       </div>

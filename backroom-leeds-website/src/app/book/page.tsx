@@ -1,20 +1,60 @@
-import { Suspense } from 'react';
-import type { Metadata } from 'next';
+'use client';
+
+import { Suspense, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { BookingLayout } from '@/components/templates';
 import { TableBookingForm } from '@/components/organisms';
-
-export const metadata: Metadata = {
-  title: 'Book a Table | The Backroom Leeds',
-  description: 'Reserve your table at The Backroom Leeds. Choose from 16 exclusive tables across two floors with premium drinks packages.',
-  keywords: ['book table Leeds', 'The Backroom Leeds booking', 'speakeasy table reservation', 'Leeds nightclub booking'],
-  openGraph: {
-    title: 'Book a Table | The Backroom Leeds',
-    description: 'Reserve your exclusive table at Leeds\' premier speakeasy',
-    type: 'website',
-  },
-};
+import { submitBooking, buildConfirmationUrl } from '@/lib/booking-api';
+import type { BookingFormData } from '@/types/components';
 
 export default function BookPage() {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string>('');
+
+  const handleBookingSubmit = async (formData: BookingFormData) => {
+    // Basic validation - ensure required fields are present
+    if (!formData.customerName || !formData.customerEmail || !formData.customerPhone || !formData.date || !formData.time) {
+      setError('Please fill in all required fields');
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.customerEmail)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    // Validate party size
+    if (formData.partySize < 1 || formData.partySize > 12) {
+      setError('Party size must be between 1 and 12 guests');
+      return;
+    }
+
+    // Clear any previous errors
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      const result = await submitBooking(formData);
+      
+      if (result.success && result.data) {
+        // Success - redirect to confirmation page
+        const confirmationUrl = buildConfirmationUrl(result.data, formData);
+        router.push(confirmationUrl);
+      } else {
+        // Handle API error
+        setError(result.error || 'An unexpected error occurred while processing your booking');
+      }
+    } catch (err) {
+      console.error('Booking submission error:', err);
+      setError('Unable to submit booking. Please check your connection and try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <BookingLayout currentStep={1} totalSteps={3}>
       <div className="container mx-auto px-4 py-12">
@@ -43,14 +83,37 @@ export default function BookPage() {
               </div>
             </div>
           </div>
+
+          {/* Error Display */}
+          {error && (
+            <div className="mb-8 max-w-2xl mx-auto">
+              <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4">
+                <p className="text-red-400 text-sm">{error}</p>
+              </div>
+            </div>
+          )}
           
           <Suspense fallback={
             <div className="animate-pulse">
               <div className="bg-speakeasy-burgundy/30 rounded-lg h-96"></div>
             </div>
           }>
-            <TableBookingForm />
+            <TableBookingForm 
+              onSubmit={handleBookingSubmit}
+              availableTables={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]} // Mock available tables for now
+              loading={isSubmitting}
+            />
           </Suspense>
+
+          {/* Loading Overlay */}
+          {isSubmitting && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="bg-speakeasy-burgundy/90 rounded-lg p-8 text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-speakeasy-gold mx-auto mb-4"></div>
+                <p className="text-speakeasy-champagne">Processing your booking...</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </BookingLayout>

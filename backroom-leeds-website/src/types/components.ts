@@ -118,6 +118,7 @@ export interface TableBookingFormProps {
   onSubmit?: (data: BookingFormData) => void;
   step?: number;
   eventId?: string;
+  loading?: boolean;
 }
 
 export interface BookingFormData {
