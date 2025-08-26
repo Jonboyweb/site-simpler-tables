@@ -44,4 +44,3 @@ export default function AdminReportsPage() {
  * - PerformanceAnalytics: System performance monitoring
  * - AuditLogs: User activity and system audit trails
  */
-}

@@ -119,7 +119,9 @@ export interface CombinationCheckResult {
 // ENHANCED BOOKING TYPES
 // ======================================================================================
 
-export interface EnhancedBooking extends Database['public']['Tables']['bookings']['Row'] {
+type BookingRow = Database['public']['Tables']['bookings']['Row'];
+
+export interface EnhancedBooking extends BookingRow {
   // Version control
   version: number;
   

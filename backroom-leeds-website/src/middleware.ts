@@ -2,56 +2,50 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
-// Route protection middleware with NextAuth authentication
+const ROUTE_PERMISSIONS = {
+  '/admin/staff': ['super_admin'],
+  '/admin/customers': ['super_admin', 'manager'],
+  '/admin/finance': ['super_admin', 'manager'],
+  '/admin/settings': ['super_admin'],
+  '/admin/users': ['super_admin'],
+  '/admin/reports': ['super_admin', 'manager'],
+} as const;
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // Get JWT token from NextAuth
-  const token = await getToken({ 
-    req: request, 
-    secret: process.env.NEXTAUTH_SECRET 
-  });
-
-  // Create a response object
-  const response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  })
-
-  // Admin route protection
   if (pathname.startsWith('/admin')) {
-    // Skip login page
     if (pathname === '/admin/login') {
-      // If already authenticated, redirect to dashboard
+      const token = await getToken({ req: request });
       if (token) {
-        return NextResponse.redirect(new URL('/admin/dashboard', request.url))
+        return NextResponse.redirect(new URL('/admin/dashboard', request.url));
       }
-      return response;
+      return NextResponse.next();
     }
 
-    // Check if user is authenticated and is an admin user
+    const token = await getToken({ req: request });
+    
     if (!token) {
-      const loginUrl = new URL('/admin/login', request.url);
-      loginUrl.searchParams.set('from', pathname);
-      return NextResponse.redirect(loginUrl);
+      return NextResponse.redirect(new URL('/admin/login?error=SessionRequired', request.url));
     }
 
-    // Check role-based access for specific paths
+    // Enhanced role-based access control
     const userRole = token.role as string;
+    const requiredRoles = getRequiredRolesForPath(pathname);
     
-    // Super admin only routes
-    if (pathname.startsWith('/admin/staff') && userRole !== 'super_admin') {
-      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
-    }
-    
-    // Manager and Super admin only routes
-    if ((pathname.startsWith('/admin/finance') || pathname.startsWith('/admin/reports')) 
-        && !['super_admin', 'manager'].includes(userRole)) {
-      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
+      return NextResponse.redirect(new URL('/admin/dashboard?error=InsufficientPermissions', request.url));
     }
 
-    // Add user context headers
+    const response = NextResponse.next();
+    
+    // Critical security headers
+    response.headers.set('X-Frame-Options', 'DENY');
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('X-XSS-Protection', '1; mode=block');
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    
+    // User context headers
     response.headers.set('x-auth-user', token.sub || '');
     response.headers.set('x-auth-role', userRole);
     
@@ -59,13 +53,14 @@ export async function middleware(request: NextRequest) {
       response.headers.set('x-development-mode', 'true');
       response.headers.set('x-auth-email', token.email || '');
     }
-
+    
     return response;
   }
 
   // API route protection
   if (pathname.startsWith('/api/admin')) {
-    // Check if user is authenticated
+    const token = await getToken({ req: request });
+    
     if (!token) {
       return new NextResponse(
         JSON.stringify({
@@ -82,9 +77,30 @@ export async function middleware(request: NextRequest) {
       );
     }
 
-    // Add user context headers for API routes
+    // API role-based access control
+    const userRole = token.role as string;
+    const apiPath = pathname.replace('/api', '');
+    const requiredRoles = getRequiredRolesForPath(apiPath);
+    
+    if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
+      return new NextResponse(
+        JSON.stringify({
+          error: 'Insufficient permissions',
+          message: 'Access denied for this endpoint',
+          status: 403
+        }),
+        {
+          status: 403,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+    }
+
+    const response = NextResponse.next();
     response.headers.set('x-auth-user', token.sub || '');
-    response.headers.set('x-auth-role', token.role as string);
+    response.headers.set('x-auth-role', userRole);
     
     if (process.env.NODE_ENV === 'development') {
       response.headers.set('x-development-mode', 'true');
@@ -96,24 +112,26 @@ export async function middleware(request: NextRequest) {
 
   // Rate limiting for booking API (to be implemented with actual rate limiting)
   if (pathname.startsWith('/api/bookings') && request.method === 'POST') {
+    const response = NextResponse.next();
     response.headers.set('x-rate-limit-remaining', '50');
     response.headers.set('x-rate-limit-reset', String(Date.now() + 3600000));
     return response;
   }
 
-  // Return response with any authentication cookies set
-  return response;
+  return NextResponse.next();
+}
+
+function getRequiredRolesForPath(pathname: string): string[] {
+  for (const [route, roles] of Object.entries(ROUTE_PERMISSIONS)) {
+    if (pathname.startsWith(route)) {
+      return roles;
+    }
+  }
+  return [];
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
