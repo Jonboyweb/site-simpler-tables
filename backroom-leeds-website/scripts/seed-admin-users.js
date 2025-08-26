@@ -27,11 +27,11 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
   },
 });
 
-// Default admin users for development
+// Default admin users for development - using environment variables
 const defaultUsers = [
   {
-    email: 'admin@backroomleeds.co.uk',
-    password: 'Admin123!BRL2024',
+    email: process.env.DEFAULT_ADMIN_EMAIL || 'admin@backroomleeds.co.uk',
+    password: process.env.DEFAULT_ADMIN_PASSWORD || 'change-me-in-production',
     role: 'super_admin',
     enable2FA: false,
   },

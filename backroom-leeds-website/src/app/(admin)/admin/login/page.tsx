@@ -28,7 +28,7 @@ export default function AdminLoginPage() {
     setError(null);
 
     try {
-      const result = await signIn('staff-credentials', {
+      const result = await signIn('credentials', {
         email,
         password,
         totp,
