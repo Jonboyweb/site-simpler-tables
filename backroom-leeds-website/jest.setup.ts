@@ -24,6 +24,16 @@ jest.mock('@/lib/supabase/client', () => ({
   })),
 }));
 
+// JWT and QR Code mocking
+jest.mock('jsonwebtoken', () => ({
+  sign: jest.fn(),
+  verify: jest.fn(),
+}));
+
+jest.mock('qrcode', () => ({
+  toDataURL: jest.fn(),
+}));
+
 // Performance monitoring setup
 global.performance.mark = jest.fn();
 global.performance.measure = jest.fn();
@@ -32,3 +42,8 @@ global.performance.measure = jest.fn();
 afterEach(() => {
   jest.clearAllMocks();
 });
+
+// TextEncoder and TextDecoder polyfills for jsdom
+import { TextEncoder, TextDecoder } from 'util';
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;

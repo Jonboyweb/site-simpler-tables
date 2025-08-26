@@ -1,17 +1,11 @@
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/extend-expect';
+import { server } from './tests/mocks/server';
 
-// Customized console logging for tests
-const originalConsoleError = console.error;
-console.error = (message, ...args) => {
-  // Skip known warning messages
-  if (
-    !message.includes('Warning: An update inside a test was not wrapped in act') &&
-    !message.includes('act(...)')
-  ) {
-    originalConsoleError(message, ...args);
-  }
-};
+// Establish API mocking before all tests
+beforeAll(() => server.listen());
 
-// Global test setup configurations
-global.fetch = require('jest-fetch-mock');
-global.fetch.enableMocks();
+// Reset any request handlers that we may add during the tests
+afterEach(() => server.resetHandlers());
+
+// Clean up after the tests are finished
+afterAll(() => server.close());

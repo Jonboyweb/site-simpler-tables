@@ -13,13 +13,13 @@ const config: Config.InitialOptions = {
   coverageReporters: ['text', 'lcov'],
   coverageThreshold: {
     global: {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80
+      branches: 90,
+      functions: 95,
+      lines: 95,
+      statements: 95
     }
   },
-  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+  testPathIgnorePatterns: ['/node_modules/', '/dist/', '/cypress/'],
   transformIgnorePatterns: ['/node_modules/(?!@axe-core/playwright)'],
 };
 

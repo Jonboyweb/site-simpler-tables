@@ -65,3 +65,6 @@ export function createServiceRoleClient() {
     }
   )
 }
+
+// Export alias for backward compatibility
+export const createServerSupabaseClient = createClient;

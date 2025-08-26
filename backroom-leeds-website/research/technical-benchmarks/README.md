@@ -106,6 +106,64 @@ Comprehensive technical research conducted for The Backroom Leeds nightclub book
 
 ---
 
+## Admin Authentication System Research (NEW)
+
+### 7. [TOTP Authentication Libraries Research 2024](./totp-authentication-libraries-research-2024.md)
+
+**Focus:** Two-factor authentication for admin security  
+**Key Findings:**
+- **speakeasy** is no longer maintained (7 years without updates)
+- **otpauth** recommended as modern TypeScript-native alternative
+- Recovery code system essential for account security
+- Server-side secret generation mandatory for security
+
+### 8. [QR Code Generation Security Research 2024](./qr-code-generation-security-research-2024.md)
+
+**Focus:** QR codes for authentication setup and booking check-in  
+**Key Findings:**
+- **qrcode** npm package recommended for server-side generation
+- Dual use case: TOTP setup (high security) vs booking check-in (medium security)
+- Error correction levels: Medium for auth, High for venue scanning
+- Cache booking QR codes (24h TTL), never cache TOTP QR codes
+
+### 9. [File Upload Security Analysis 2024](./file-upload-security-analysis-2024.md)
+
+**Focus:** Event artwork upload system (JPEG/PNG, 5MB max)  
+**Key Findings:**
+- **Next.js 15.5 built-in** handling recommended over multer/formidable
+- **Magic number validation** critical (file-type package)
+- **sharp** for secure image processing and metadata sanitization
+- Multer file validation is NOT secure without additional measures
+
+### 10. [RBAC Patterns in Next.js Research 2024](./rbac-patterns-nextjs-research-2024.md)
+
+**Focus:** Three-tier admin system (Super Admin, Manager, Door Staff)  
+**Key Findings:**
+- **Auth.js v5** recommended for comprehensive RBAC
+- Middleware-level, API-level, and component-level protection layers
+- Time-based and context-based permissions for venue operations
+- Session invalidation and management crucial for security
+
+### 11. [Database Security for Authentication Research 2024](./database-security-authentication-research-2024.md)
+
+**Focus:** Password hashing, TOTP encryption, session storage  
+**Key Findings:**
+- **Argon2id** recommended for password hashing (industry standard)
+- **Encrypted TOTP secrets** at rest (AES-256-GCM)
+- **Redis session storage** for performance and security
+- User enumeration prevention with consistent timing
+
+### 12. [Admin Authentication System Comprehensive Research 2024](./admin-authentication-system-comprehensive-research-2024.md)
+
+**Focus:** Complete technology stack for secure admin system  
+**Comprehensive Analysis:**
+- All technology components evaluated and benchmarked
+- Implementation strategy with 3-week development timeline
+- Security vulnerabilities and mitigation strategies
+- Performance benchmarks and system requirements
+
+---
+
 ## Key Performance Benchmarks
 
 ### Loading Performance Targets

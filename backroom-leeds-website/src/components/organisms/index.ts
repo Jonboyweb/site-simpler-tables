@@ -14,3 +14,7 @@ export { DigitalWalletPayment, DigitalWalletWrapper } from './DigitalWalletPayme
 export { BNPLPayment } from './BNPLPayment';
 export { BankTransferPayment } from './BankTransferPayment';
 export { CancellationHandler } from './CancellationHandler';
+
+// Admin Dashboard Components
+export { SuperAdminDashboard } from './SuperAdminDashboard';
+export { DoorStaffDashboard } from './DoorStaffDashboard';

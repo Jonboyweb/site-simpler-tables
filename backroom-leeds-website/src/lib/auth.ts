@@ -76,7 +76,7 @@ export const getPermissionsForRole = (role: string): StaffPermissions => {
   }
 };
 
-export const authConfig: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'staff-credentials',
@@ -90,7 +90,7 @@ export const authConfig: NextAuthOptions = {
           throw new Error('Email and password are required');
         }
 
-        const supabase = createClient();
+        const supabase = await createClient();
 
         try {
           // Get staff user from database
@@ -218,7 +218,7 @@ export const authConfig: NextAuthOptions = {
   events: {
     async signOut({ token }) {
       if (token?.sub) {
-        const supabase = createClient();
+        const supabase = await createClient();
         // Log logout event
         await supabase
           .from('audit_log')
@@ -233,3 +233,6 @@ export const authConfig: NextAuthOptions = {
     },
   },
 };
+
+// Export alias for backward compatibility
+export const authConfig = authOptions;
